@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="添加店铺类别" :visible="shopTypeVisible" @update:visible="v=>$emit('update:shop-type-visible',v)">
+    <el-dialog title="添加店铺类别" :visible="dialogFormVisible" >
         <el-form :model="form">
             <el-form-item label="店铺类别" label-width="120px">
                 <el-input v-model="form.shopType" autocomplete="off" style="width: 80%"></el-input>
@@ -34,7 +34,8 @@
             return{
                 form:{
                     shopType:""
-                }
+                },
+                dialogFormVisible:false
             }
         },
         props:{
@@ -45,8 +46,13 @@
         },
         methods:{
             submitUpload() {
-                this.$refs.upload.submit();
-                this.$store.dispatch("getShopTypeList")
+                if(this.$refs.upload.uploadFiles.length>0){
+                    this.dialogFormVisible=false;
+                    this.$refs.upload.submit();
+                    this.$store.dispatch("getShopTypeList")
+                }else{
+                    this.$message.error("请上传文件");
+                }
             },
             success(res){
                 if(res.ok === 2 || res.ok === 3){

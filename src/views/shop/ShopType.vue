@@ -9,11 +9,11 @@
                     <el-button type="primary" @click="search()">查询</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="success" @click="shopTypeVisible = true">添加店铺类别</el-button>
+                    <el-button type="success" @click="addShopType">添加店铺类别</el-button>
                 </el-form-item>
             </el-form>
         </div>
-        <AddShopType v-if="shopTypeVisible" :shop-type-visible.sync="shopTypeVisible"></AddShopType>
+        <AddShopType ref="shopType"></AddShopType>
         <AddShop  ref="shopCom"></AddShop>
         <div>
             <el-table
@@ -79,6 +79,9 @@
             }
         },
         methods:{
+            addShopType(){
+                this.$refs.shopType.dialogFormVisible=true;
+            },
             submitUpload() {
                 this.$refs.upload.submit();
                 this.shopTypeVisible = false;

@@ -48,10 +48,15 @@
                 this.$refs.upload.clearFiles();
             },
             submitForm(){
-                this.dialogFormVisible=false;
-                axios.post("/goodsType",this.form).then(()=>{
-                    this.success()
-                })
+                if(this.form.goodsType.length>0){
+                    this.dialogFormVisible=false;
+                    axios.post("/goodsType",this.form).then(()=>{
+                        this.success()
+                    })
+                }else{
+                    this.$message.error("请输入商品类别");
+                }
+
             },
             change(){
                 this.form.shopId="";

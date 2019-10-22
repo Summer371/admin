@@ -93,8 +93,13 @@
                 }
             },
             submitForm(){
-                this.dialogFormVisible=false;
-                this.$refs.upload.submit();
+                if(this.$refs.upload.uploadFiles.length>0){
+                    this.dialogFormVisible=false;
+                    this.$refs.upload.submit();
+                }else{
+                    this.$message.error("请上传商品图片");
+                }
+
             },
             getShopList(){
                 this.form.shopId="";
