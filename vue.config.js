@@ -5,7 +5,7 @@ module.exports={
         host:"127.0.0.1",
         proxy:{
             "^/ele":{
-                target:"http://127.0.0.1:8088",
+                target:"http://47.98.238.74:8088",
                 changeOrigin:true,
                 pathRewrite:{
                     "^/ele":""

@@ -3,7 +3,7 @@
         <div class="toolbar">
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
-                    <el-button type="success" @click="$refs.goodsTypeCom.dialogFormVisible=true;$store.dispatch('getAllShopTypeList')">
+                    <el-button type="success" @click="addGoodsType">
                         添加商品类别</el-button>
                 </el-form-item>
             </el-form>
@@ -104,6 +104,10 @@
                         message: '已取消删除'
                     });
                 });
+            },
+            addGoodsType(){
+                $refs.goodsTypeCom.dialogFormVisible=true;
+                this.$store.dispatch('getAllShopTypeList');
             },
             addGoods(data){
                 this.$refs.goodsCom.dialogFormVisible=true;

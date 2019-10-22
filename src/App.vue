@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
     <el-container>
       <el-header>
         <el-row>
@@ -47,7 +46,6 @@
         <el-main><router-view/></el-main>
       </el-container>
     </el-container>
-
   </div>
 </template>
 <script>

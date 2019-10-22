@@ -4,7 +4,7 @@ const state = {
     token:localStorage.token,
     adminLog:[],
     ip:returnCitySN["cip"]
-}
+};
 const mutations={
     CHANGE_ADMIN_TOKEN(state,{adminName,token}){
         state.token=localStorage.token=token;
@@ -17,7 +17,7 @@ const mutations={
     GET_LOG(stage,adminLog){
         state.adminLog = adminLog;
     }
-}
+};
 const actions={
     adminLogin(content,{adminInfo}){
         return new Promise(async (resolve,reject)=>{
@@ -49,7 +49,6 @@ const actions={
         })
     }
 }
-
 export default {
     actions,
     state,

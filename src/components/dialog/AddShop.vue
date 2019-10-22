@@ -58,9 +58,13 @@
                 this.$refs.upload.clearFiles();
             },
             submitUpload(){
-                this.dialogFormVisible=false;
-                this.$refs.upload.submit();
-                this.$store.dispatch("getShop")
+                if(this.$refs.upload.uploadFiles.length>0){
+                    this.dialogFormVisible=false;
+                    this.$refs.upload.submit();
+                    this.$store.dispatch("getShop")
+                }else{
+                    this.$message.error("请上传文件");
+                }
             },
             success(){
                 this.$refs.myForm.resetFields();
