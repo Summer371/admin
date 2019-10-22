@@ -21,7 +21,7 @@
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
         <div slot="footer" class="dialog-footer">
-            <el-button @click="$emit('update:shop-type-visible',false)">取 消</el-button>
+            <el-button @click="cancel">取 消</el-button>
             <el-button type="primary" @click="submitUpload">确 定</el-button>
         </div>
     </el-dialog>
@@ -45,6 +45,9 @@
             },
         },
         methods:{
+            cancel(){
+              this.dialogFormVisible=false;
+            },
             submitUpload() {
                 if(this.$refs.upload.uploadFiles.length>0){
                     this.dialogFormVisible=false;
