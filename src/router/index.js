@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import admin from "./admin"
 import shop from "./shop"
 import goods from "./goods"
+import ad from "./ad";
 Vue.use(Router)
 const router=new Router({
     mode: 'history',
@@ -12,6 +13,7 @@ const router=new Router({
         ...admin,
         ...shop,
         ...goods,
+        ...ad
     ]
 })
 

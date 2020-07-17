@@ -10,7 +10,6 @@ const {upPic} = require("./module/upPic");
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
 //*********************后台*****************************
-
 //登陆注册
 app.post("/adminLogin",function (req,res) {
     const {adminName,passWord,ip,location}= req.body;
@@ -43,7 +42,8 @@ app.post("/adminLogin",function (req,res) {
         }else{
             tools.json(res,-1,"管理员账号或密码错误")
         }
-    }).catch(()=>{
+    }).catch((e)=>{
+        console.log(e)
         tools.json(res);
     })
 });
@@ -155,7 +155,7 @@ app.get("/swiperShopType",async function (req,res) {
         for(let j=i*m;j<((1+i)*m>data.length?data.length:(1+i)*m);j++){
             shopTypeList[i].push(data[j])
         }
-    };
+    }
     res.json({
         ok:1,
         shopTypeList
@@ -261,14 +261,23 @@ app.delete("/adminLog", function (req,res) {
 //店铺类型
 app.post("/shopType",async function (req,res) {
     const {newPicName,params} = await upPic(req,"shopTypePic");
-    db.insertOne("shopTypeList",{
-        shopTypePic:newPicName,
-        shopType:params.shopType
-    });
-    res.json({
-        ok:1,
-        msg:"上传成功"
-    })
+    const result=await db.findOne("shopTypeList",{ shopType:params.shopType});
+    if(result){
+        res.json({
+            ok:-1,
+            msg:"店铺类别已存在"
+        })
+    }else{
+        db.insertOne("shopTypeList",{
+            shopTypePic:newPicName,
+            shopType:params.shopType
+        });
+        res.json({
+            ok:1,
+            msg:"上传成功"
+        })
+    }
+
 });
 app.get("/shopTypeList",async function (req,res) {
     const whereObj={};
@@ -484,6 +493,23 @@ app.get("/goodsList",async function (req,res) {
         goodsList
     })
 });
+
+//广告
+app.post("/adType",async (req,res)=>{
+    const {newPicName,params} = await upPic(req,"adTypePic");
+    const result=await db.insertOne("adTypeList",{
+        shopTypePic:newPicName,
+        shopType:params.shopType
+    });
+    if(result){
+        res.json({
+            ok:1,
+            msg:"上传成功"
+        })
+    }
+
+});
+
 //删除
 app.delete("/shopTypeList",async function (req,res) {
     const id=req.query.id;
@@ -548,7 +574,7 @@ app.delete("/goods",async function (req,res) {
                         ok:1,
                         msg:"删除成功"
                     });
-                }).catch((err)=>res.json({ok:-1,msg:"删除失败"}));
+                }).catch((er)=>res.json({ok:-1,msg:"删除失败"}));
             }
         })
     }catch{
@@ -562,5 +588,5 @@ app.delete("/goods",async function (req,res) {
 //*********************前端*************************************
 
 app.listen(8088,function () {
-    console.log("success")
+    console.log("server start success on 8088")
 });

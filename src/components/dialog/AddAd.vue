@@ -38,7 +38,7 @@
 
 <script>
     export default {
-        name: "AddShop",
+        name: "AddAd",
         data(){
             return{
                 form:{

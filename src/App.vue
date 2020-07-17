@@ -4,10 +4,10 @@
       <el-header>
         <el-row>
           <el-col class="logo" :span="8" :style="{width:isCollapse?'64px':'240px',transition:'0.8s'}" >
-            <strong>{{isCollapse?'饿':'饿了么管理系统'}}</strong>
+            <strong>小优购物管理系统</strong>
           </el-col>
           <el-col class="info" :span="8">
-            <i :class="isCollapse?'el-icon-d-arrow-right':'el-icon-d-arrow-left'" @click="isCollapse=!isCollapse"></i>
+<!--            <i :class="isCollapse?'el-icon-d-arrow-right':'el-icon-d-arrow-left'" @click="isCollapse=!isCollapse"></i>-->
           </el-col>
           <el-col :span="8" class="adminInfo">
             <el-dropdown trigger="click">
@@ -25,7 +25,7 @@
         <el-aside width="200px">
           <el-menu :default-active="$route.path" :collapse="isCollapse" :collapse-transition="false" :router="true">
             <el-submenu index="1">
-              <template slot="title"><i class="el-icon-message"></i>管理员</template>
+              <template slot="title"><i class="el-icon-user"></i>管理员</template>
                 <el-menu-item index="/">管理员日志</el-menu-item>
                 <el-menu-item index="/singn">注册管理员</el-menu-item>
             </el-submenu>
@@ -36,11 +36,17 @@
               <el-menu-item index="/shopList">店铺列表</el-menu-item>
             </el-submenu>
             <el-submenu index="3">
-              <template slot="title"><i class="el-icon-message"></i>商品设置</template>
+              <template slot="title"><i class="el-icon-goods"></i>商品设置</template>
               <el-menu-item index="/goodsType">商品类别</el-menu-item>
               <el-menu-item index="/goods">商品管理</el-menu-item>
               <el-menu-item index="/goodsList">商品列表</el-menu-item>
             </el-submenu>
+              <el-submenu index="4">
+                  <template slot="title"><i class="el-icon-data-line"></i>广告设置</template>
+                  <el-menu-item index="/adType">广告类别</el-menu-item>
+                  <el-menu-item index="/ad">广告管理</el-menu-item>
+
+              </el-submenu>
           </el-menu>
         </el-aside>
         <el-main><router-view/></el-main>
@@ -79,7 +85,7 @@
       width: 240px;
       font-size: 25px;
       line-height: 60px;
-      border-right: 1px solid rgba(238, 241, 146, 0.3);
+    /*  border-right: 1px solid rgba(238, 241, 146, 0.3);*/
     }
     .adminInfo {
       float: right;

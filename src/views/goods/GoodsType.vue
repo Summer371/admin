@@ -3,6 +3,12 @@
         <div class="toolbar">
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
+                    <el-input v-model="form.goodsType" placeholder="请输入商品类别"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="search">查询</el-button>
+                </el-form-item>
+                <el-form-item>
                     <el-button type="success" @click="addGoodsType">
                         添加商品类别</el-button>
                 </el-form-item>
@@ -17,28 +23,28 @@
                     style="width: 100%">
                 <el-table-column
                         label="商品类别ID"
-                        width="260">
+                        >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row._id}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="商品类别"
-                        width="180">
+                       >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.goodsType}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="店铺名称"
-                        width="180">
+                       >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.shopName}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="是否推荐"
-                        width="160">
+                        >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.isRecommend?"是":"否"}}</span>
                     </template>
@@ -52,7 +58,7 @@
                 </el-table-column>
                 <el-table-column
                         label="操作"
-                        width="300">
+                       >
                     <template slot-scope="scope">
                         <el-button
                                 size="mini"
@@ -106,7 +112,7 @@
                 });
             },
             addGoodsType(){
-                $refs.goodsTypeCom.dialogFormVisible=true;
+                this.$refs.goodsTypeCom.dialogFormVisible=true;
                 this.$store.dispatch('getAllShopTypeList');
             },
             addGoods(data){
@@ -117,6 +123,9 @@
                 this.$refs.goodsCom.form.shopTypeId=data.shopTypeId;
                 this.$refs.goodsCom.form.shopId=data.shopId;
                 this.$refs.goodsCom.form.goodsTypeId=data._id;
+            },
+            search(){
+                this.$store.dispatch("getGoodsType",{keyWord:this.form.goodsType})
             }
         },
         mounted(){

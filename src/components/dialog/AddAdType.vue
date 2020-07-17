@@ -1,13 +1,8 @@
 <template>
-    <el-dialog :title="title?'修改店铺':'添加店铺'" :visible.sync="dialogFormVisible" >
+    <el-dialog :title="title?'修改广告':'添加广告'" :visible.sync="dialogFormVisible" >
         <el-form :model="form" ref="myForm">
-            <el-form-item label="店铺名称" prop="shopName" label-width="120px">
+            <el-form-item label="广告类别" prop="shopName" label-width="120px">
                 <el-input v-model="form.shopName" autocomplete="off" style="width: 80%"></el-input>
-            </el-form-item>
-            <el-form-item label="店铺类别" prop="shopTypeId" label-width="120px">
-                <el-select v-model="form.shopTypeId" placeholder="请选择店铺类别">
-                    <el-option v-for="item in $store.state.shop.allShopTypeList" :value="item._id" :label="item.shopType" :key="item._id"></el-option>
-                </el-select>
             </el-form-item>
             <el-form-item label="是否推荐" label-width="120px">
                 <el-radio v-model="form.isRecommend" :label="true">是</el-radio>
@@ -20,7 +15,7 @@
                 :data="form"
                 name="shopPic"
                 :headers="{authorization:$store.state.admin.token}"
-                :action="title?'/ele/updateShop':'/ele/shop'"
+                :action="title?'/ele/updateAd':'/ele/addAd'"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"
@@ -61,7 +56,7 @@
                 if(this.$refs.upload.uploadFiles.length>0){
                     this.dialogFormVisible=false;
                     this.$refs.upload.submit();
-                    this.$store.dispatch("getShop")
+                    this.getAdType();
                 }else{
                     this.$message.error("请上传文件");
                 }
@@ -69,11 +64,19 @@
             success(){
                 this.$refs.myForm.resetFields();
                 this.$refs.upload.clearFiles();
-                if(this.$route.name!=="shop"){
-                    this.$router.push("/shop")
+                if(this.$route.name!=="ad"){
+                    this.$router.push("/ad")
                 }
-                this.$store.dispatch("getShop")
+              this.getAdType();
+            },
+            getAdType(){
+                this.$axios.get("/adType").then(data=>{
+                    console.log(data)
+                })
             }
+        },
+        mounted() {
+
         }
     }
 </script>

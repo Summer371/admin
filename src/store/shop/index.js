@@ -16,8 +16,13 @@ const actions={
             commit("GET_SHOP_TYPE_LIST",shopTypeList.shopTypeList);
             commit("CHANGE_PAGE_INFO",shopTypeList);
     },
-    async getAllShopTypeList({commit}){
-        const {shopTypeList} =await axios.get("/allShopTypeList");
+    async getAllShopTypeList({commit},data={}){
+        const {keyWord=""}=data;
+        const {shopTypeList} =await axios.get("/allShopTypeList",{
+            params:{
+                keyWord
+            }
+        });
         commit("GET_ALL_SHOP_TYPE_LIST",shopTypeList);
     },
     async getShop({commit},data={}){

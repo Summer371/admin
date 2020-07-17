@@ -1,6 +1,6 @@
 <template>
     <el-form :model="adminInfo" :rules="rules" ref="adminForm" class="container">
-        <h3>饿了么管理员登录系统</h3>
+        <h3>小优商城管理员登录系统</h3>
         <el-form-item  prop="adminName">
             <el-input v-model="adminInfo.adminName" placeholder="管理员账号"></el-input>
         </el-form-item>

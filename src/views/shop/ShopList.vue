@@ -18,7 +18,7 @@
                     style="width: 100%">
                 <el-table-column
                         label="店铺ID"
-                        width="250">
+                        >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row._id}}</span>
                     </template>
@@ -26,28 +26,28 @@
 
                 <el-table-column
                         label="店铺名字"
-                        width="200">
+                        >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.shopName}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="店铺类别"
-                        width="200">
+                       >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.shopType}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="是否推荐"
-                        width="160">
+                       >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.isRecommend=="true"?"是":"否"}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="图片"
-                        width="180">
+                       >
                     <template slot-scope="scope">
                         <el-image
                                 style="width: 100px; height: 100px"

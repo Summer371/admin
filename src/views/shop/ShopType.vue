@@ -22,22 +22,22 @@
                     :data="$store.state.shop.shopTypeList"
                     style="width: 100%">
                 <el-table-column
-                        label="店铺ID"
-                        width="260">
+                        label="店铺类别ID"
+                        >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row._id}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="店铺类别"
-                        width="200">
+                       >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.shopType}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="图片"
-                        width="300">
+                        >
                     <template slot-scope="scope">
                         <el-image
                                 style="width: 100px; height: 100px"
@@ -49,7 +49,7 @@
                 </el-table-column>
                 <el-table-column
                         label="操作"
-                        width="300">
+                        >
                     <template slot-scope="scope">
                         <el-button
                                 size="mini"

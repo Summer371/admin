@@ -4,7 +4,9 @@ const components = {
     AddShopType:()=>import("@/components/dialog/AddShopType"),
     AddShop:()=>import("@/components/dialog/AddShop"),
     AddGoodsType:()=>import("@/components/dialog/AddGoodsType"),
-    AddGoods:()=>import("@/components/dialog/AddGoods")
+    AddGoods:()=>import("@/components/dialog/AddGoods"),
+    AddAd:()=>import("@/components/dialog/AddAd"),
+    AddAdType:()=>import("@/components/dialog/AddAdType")
 }
 export default {
     install(Vue){

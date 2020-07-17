@@ -52,15 +52,19 @@
                 if(this.$refs.upload.uploadFiles.length>0){
                     this.dialogFormVisible=false;
                     this.$refs.upload.submit();
+
                     this.$store.dispatch("getShopTypeList")
                 }else{
-                    this.$message.error("请上传文件");
+                    this.$message.error("请上传图片");
                 }
             },
             success(res){
                 if(res.ok === 2 || res.ok === 3){
                     this.$store.commit("OUT_LOGIN")
-                }else{
+                }else if(res.ok === -1){
+                    this.$message.error(res.msg)
+                }
+                else{
                     this.$emit("update:shop-type-visible",false);
                     this.$store.dispatch("getShopTypeList");
                     if(this.$route.name==="shopType")
