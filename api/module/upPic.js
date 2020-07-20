@@ -31,7 +31,7 @@ module.exports.upPic = function (req, imgName) {
                 const imgExtName = path.extname(imgInfo.path).toLowerCase();
                 //判断数组当中是否包含上传文件的扩展名
                 if (extArr.includes(imgExtName)) {
-                    const newPicName = Date.now() + imgExtName;
+                    const newPicName =imgName+ Date.now() + imgExtName;
                     fs.rename(imgInfo.path,uploadDir +"/" + newPicName, function (err) {
                        resolve({
                            ok:1,
@@ -52,8 +52,8 @@ module.exports.upPic = function (req, imgName) {
         })
     })
 }
-module.exports.delPic=async function (req,coll) {
-    fs.unlink(__dirname+"/upload/"+info.picName,async function (err) {
+module.exports.delPic=async function (req,coll,info) {
+    fs.unlink(__dirname+"/upload/"+info.picName, function (err) {
         if(err){
             res.json({
                 ok:-1,

@@ -49,7 +49,7 @@ module.exports.enToken = function (payload) {
     return jwt.encode({
         ...payload,
         ...{
-            lastTime:Date.now()+10*1000*60*24
+            lastTime:Date.now()+60*1000*60*10
         }
     },key)
 }

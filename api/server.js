@@ -111,8 +111,8 @@ app.post("/sendCode",async function (req,res) {
 app.get("/searchShopList",async function (req,res) {
     const whereObj={};
     const keyWord=req.query.keyWord || '';
-    if(req.query.keyWord.length>0){
-        whereObj.shopName=new RegExp(req.query.keyWord);
+    if(keyWord.length>0){
+        whereObj.shopName=new RegExp(keyWord);
         const shopList=await db.find("shopList",{whereObj});
         res.json({
             ok:1,
@@ -140,7 +140,7 @@ app.get("/recommendShopList",async function (req,res) {
 
 });
 app.get("/swiperShopType",async function (req,res) {
-    const limit=req.query.limit/1;
+    const limit=(req.query.limit)/1;
     const data=await db.find("shopTypeList",{
         limit,
         sort:{
@@ -194,13 +194,22 @@ app.post("/userLogin",function (req,res) {
             })
 });
 app.all("*",function (req,res,next) {
-    const {ok,msg}=tools.deToken(req.headers.authorization);
-    if(ok==1){
-        next();
-    }else{
-        res.json({
-            ok,msg
-        })
+    res.header("Access-Control-Allow-Origin","*");
+    //允许的header类型
+    res.header("Access-Control-Allow-Headers","content-type");
+    //跨域允许的请求方式
+    res.header("Access-Control-Allow-Methods","DELETE,PUT,POST,GET,OPTIONS");
+    if (req.method.toLowerCase() == 'options')
+        res.send(200);  //让options尝试请求快速结束
+    else {
+        const {ok,msg}=tools.deToken(req.headers.authorization);
+        if(ok==1){
+            next();
+        }else{
+            res.json({
+                ok,msg
+            })
+        }
     }
 });
 //管理员登录日志
@@ -251,7 +260,7 @@ app.get("/check",async function (req,res) {
 });
 app.delete("/adminLog", function (req,res) {
     const id=req.query.id;
-   db.deleteOneById("adminLog",id).then(data=>{
+   db.deleteOneById("adminLog",id).then(()=>{
        res.json({
            ok:1,
            msg:"删除成功"
@@ -260,23 +269,43 @@ app.delete("/adminLog", function (req,res) {
 });
 //店铺类型
 app.post("/shopType",async function (req,res) {
-    const {newPicName,params} = await upPic(req,"shopTypePic");
-    const result=await db.findOne("shopTypeList",{ shopType:params.shopType});
-    if(result){
-        res.json({
-            ok:-1,
-            msg:"店铺类别已存在"
-        })
-    }else{
-        db.insertOne("shopTypeList",{
-            shopTypePic:newPicName,
-            shopType:params.shopType
-        });
-        res.json({
-            ok:1,
-            msg:"上传成功"
-        })
-    }
+        const {newPicName,params} = await upPic(req,"shopTypePic");
+        const result=await db.findOne("shopTypeList",{ shopType:params.shopType});
+        if(result){
+            fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
+                if(err){
+                    res.json({
+                        ok:-1,
+                        msg:"删除失败"
+                    })
+                }else{
+                    res.json({
+                        ok:1,
+                        msg:"删除成功"
+                    })
+                }
+            });
+            res.json({
+                ok:-1,
+                msg:"店铺类别已存在"
+            })
+        }else{
+            db.insertOne("shopTypeList",{
+                shopTypePic:newPicName,
+                shopType:params.shopType,
+                createTime:Date.now()
+            }).then(()=>{
+                res.json({
+                    ok:1,
+                    msg:"添加成功"
+                })
+            }).catch(()=>{
+                res.json({
+                    ok:-1,
+                    msg:"添加失败"
+                })
+            })
+        }
 
 });
 app.get("/shopTypeList",async function (req,res) {
@@ -286,9 +315,9 @@ app.get("/shopTypeList",async function (req,res) {
     }
     const shopTypeList=await db.getPageInfo("shopTypeList",{
         pageIndex:(req.query.pageIndex || 1)/1,
-        sort:{"shopTypePic":-1},
+        sort:{"createTime":-1},
         resultsName:"shopTypeList",
-        limit:3,
+        limit:4,
         whereObj
     });
     res.json({
@@ -298,7 +327,7 @@ app.get("/shopTypeList",async function (req,res) {
 });
 app.get("/allShopTypeList",async function (req,res) {
    const shopTypeList=await db.find("shopTypeList",{
-       sort:{"shopTypePic":-1}
+       sort:{"createTime":-1}
    });
     res.json({
         ok:1,
@@ -308,20 +337,42 @@ app.get("/allShopTypeList",async function (req,res) {
 //店铺
 app.post("/shop",async function (req,res) {
     const {newPicName,params} = await upPic(req,"shopPic");
-    const shopTypeInfo = await db.findOneById("shopTypeList",params.shopTypeId);
-    db.insertOne("shopList",{
-        shopPic:newPicName,
-        shopType:shopTypeInfo.shopType,
-        shopTypeId:shopTypeInfo._id,
-        shopName:params.shopName,
-        isRecommend:params.isRecommend,
-        createTime:Date.now()
-    }).then(data=>{
-        res.json({
-            ok:1,
-            msg:"上传成功"
+    const result=await db.findOne("shopList",{ shopName:params.shopName});
+    if(result){
+        fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
+            if(err){
+                res.json({
+                    ok:-1,
+                    msg:"删除失败"
+                })
+            }else{
+                res.json({
+                    ok:1,
+                    msg:"删除成功"
+                })
+            }
         })
-    })
+        res.json({
+            ok:-1,
+            msg:"店铺类别已存在"
+        })
+    }else{
+        const shopTypeInfo = await db.findOneById("shopTypeList",params.shopTypeId);
+        db.insertOne("shopList",{
+            shopPic:newPicName,
+            shopType:shopTypeInfo.shopType,
+            shopTypeId:shopTypeInfo._id,
+            shopName:params.shopName,
+            isRecommend:params.isRecommend,
+            createTime:Date.now()
+        }).then(()=>{
+            res.json({
+                ok:1,
+                msg:"上传成功"
+            })
+        })
+    }
+
 });
 app.post("/updateShop",async function (req,res) {
     const {newPicName,params} = await upPic(req,"shopPic");
@@ -334,7 +385,7 @@ app.post("/updateShop",async function (req,res) {
         shopName:params.shopName,
         isRecommend:params.isRecommend,
         createTime:Date.now()}
-    }).then(data=>{
+    }).then(()=>{
         res.json({
             ok:1,
             msg:"上传成功"
@@ -371,7 +422,7 @@ app.get("/thisTypeShop",async function (req,res) {
 });
 //商品
 app.post("/goodsType",async function (req,res) {
-    const {goodsType,shopId,shopTypeId,isRecommend}=req.body;
+    const {goodsType,shopTypeId,isRecommend}=req.body;
     try{
         const data =await db.findOne("shopList",{
             shopTypeId:mongodb.ObjectId(shopTypeId)
@@ -384,13 +435,18 @@ app.post("/goodsType",async function (req,res) {
             shopTypeId:data.shopTypeId,
             isRecommend,
             createTime:Date.now()
-        });
-        res.json({
-            ok:1,
-            msg:"添加成功"
+        }).then(()=>{
+            res.json({
+                ok:1,
+                msg:"添加成功"
+            })
         })
     }catch(err){
-        res.json(err)
+        res.json({
+            ok:-1,
+            msg:err
+        })
+
     }
 
 });
@@ -405,7 +461,7 @@ app.get("/goodsTypeList",async function (req,res) {
         limit:3,
         sort:{createTime:-1},
         whereObj
-    })
+    });
     res.json({
         ok:1,
         goodsTypeList
@@ -422,33 +478,47 @@ app.get("/thisTypeGoods",async function (req,res) {
         }
     });
     res.json({
-        thisTypeGoodsList
+        thisTypeGoodsList,
+        ok:1
     });
 });
 app.post("/goods",async function (req,res) {
     const {newPicName,params} = await upPic(req,"goodsPic");
-    const goodsTypeInfo = await db.findOneById("goodsTypeList",params.goodsTypeId);
-    const shopInfo=await db.findOneById("shopList",goodsTypeInfo.shopId);
-    db.insertOne("goodsList",{
-        goodsPic:newPicName,
+
+   // const shopInfo=await db.findOneById("shopList",goodsTypeInfo.shopId);
+    const result =await db.find("goodsList",{
         goodsName:params.goodsName,
-        goodsType:goodsTypeInfo.shopType,
-        goodsTypeId:goodsTypeInfo._id,
-        shopId:goodsTypeInfo.shopId,
-        shopName:goodsTypeInfo.shopName,
-        shopType:goodsTypeInfo.shopType,
-        shopTypeId:goodsTypeInfo.shopTypeId,
-        goodsOldPrice:params.goodsOldPrice,
-        goodsNewPrice:params.goodsNewPrice,
-        goodsNum:params.goodsNum,
-        isRecommend:params.isRecommend,
-        createTime:Date.now()
-    }).then(data=>{
+    })
+    if(result){
         res.json({
-            ok:1,
-            msg:"上传成功"
+            ok:-1,
+            msg:"商品已存在"
         })
-    });
+        return
+    }
+        const goodsTypeInfo = await db.findOneById("goodsTypeList",params.goodsTypeId);
+        db.insertOne("goodsList",{
+            goodsPic:newPicName,
+            goodsName:params.goodsName,
+            goodsType:goodsTypeInfo.shopType,
+            goodsTypeId:goodsTypeInfo._id,
+            shopId:goodsTypeInfo.shopId,
+            shopName:goodsTypeInfo.shopName,
+            shopType:goodsTypeInfo.shopType,
+            shopTypeId:goodsTypeInfo.shopTypeId,
+            goodsOldPrice:params.goodsOldPrice,
+            goodsNewPrice:params.goodsNewPrice,
+            goodsNum:params.goodsNum,
+            isRecommend:params.isRecommend,
+            createTime:Date.now()
+        }).then(()=>{
+            res.json({
+                ok:1,
+                msg:"上传成功"
+            })
+        });
+
+
 });
 app.post("/updateGoods",async function(req,res){
     const {newPicName,params} = await upPic(req,"goodsPic");
@@ -469,7 +539,7 @@ app.post("/updateGoods",async function(req,res){
             isRecommend: params.isRecommend,
             createTime: Date.now()
         }
-    }).then(data=>{
+    }).then(()=>{
         res.json({
             ok:1,
             msg:"修改成功"

@@ -72,6 +72,7 @@
                 </el-table-column>
                 <el-table-column
                         label="是否推荐"
+                        width="80"
                         >
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{scope.row.isRecommend=="true"?"是":"否"}}</span>
@@ -86,6 +87,13 @@
                                 :src="'/ele/'+scope.row.goodsPic" alt="帅哥"
                                 :preview-src-list="['/ele/'+scope.row.goodsPic]">
                         </el-image>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        label="创建时间"
+                >
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{scope.row.createTime | date}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column

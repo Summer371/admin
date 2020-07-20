@@ -47,13 +47,13 @@
         methods:{
             cancel(){
               this.dialogFormVisible=false;
+              this.$refs.upload.clearFiles();
+              this.form.shopType='';
             },
             submitUpload() {
                 if(this.$refs.upload.uploadFiles.length>0){
                     this.dialogFormVisible=false;
                     this.$refs.upload.submit();
-
-                    this.$store.dispatch("getShopTypeList")
                 }else{
                     this.$message.error("请上传图片");
                 }
@@ -65,6 +65,9 @@
                     this.$message.error(res.msg)
                 }
                 else{
+                    this.$message.success("添加成功");
+                    this.form.shopType='';
+                    this.$refs.upload.clearFiles();
                     this.$emit("update:shop-type-visible",false);
                     this.$store.dispatch("getShopTypeList");
                     if(this.$route.name==="shopType")
@@ -72,7 +75,8 @@
                     else
                         this.$router.push({name:"shopType"})
                 }
-            }
+            },
+
         }
     }
 </script>

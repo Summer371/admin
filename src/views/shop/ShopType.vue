@@ -48,6 +48,13 @@
                     </template>
                 </el-table-column>
                 <el-table-column
+                        label="创建时间"
+                >
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{scope.row.createTime | date}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
                         label="操作"
                         >
                     <template slot-scope="scope">

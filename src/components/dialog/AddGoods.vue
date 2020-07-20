@@ -6,17 +6,17 @@
             </el-form-item>
             <el-form-item label="店铺类别" prop="goodsType" label-width="120px">
                 <el-select v-model="form.shopTypeId" placeholder="请选择店铺类别" @change="getShopList">
-                    <el-option v-for="item in $store.state.shop.allShopTypeList" :value="item._id" :label="item.shopType"></el-option>
+                    <el-option v-for="item in $store.state.shop.allShopTypeList" :key="item._id" :value="item._id" :label="item.shopType"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="店铺名称" prop="goodsType" label-width="120px" >
                 <el-select v-model="form.shopId" placeholder="请选择店铺名称" @change="getGoodsList">
-                    <el-option v-for="item in $store.state.goods.thisTypeShopList" :value="item._id" :label="item.shopName"></el-option>
+                    <el-option v-for="item in $store.state.goods.thisTypeShopList" :value="item._id"  :key="item._id" :label="item.shopName"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="商品类型" prop="goodsType" label-width="120px">
                 <el-select v-model="form.goodsTypeId" placeholder="请选择商品类别">
-                    <el-option v-for="item in $store.state.goods.thisTypeGoodsList" :value="item._id" :label="item.goodsType"></el-option>
+                    <el-option v-for="item in $store.state.goods.thisTypeGoodsList" :value="item._id"  :key="item._id" :label="item.goodsType"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="商品原价" prop="goodsOldPrice" label-width="120px">
@@ -84,13 +84,20 @@
                 this.$refs.myForm.resetFields();
                 this.$refs.upload.clearFiles();
             },
-            success(){
-                this.$refs.myForm.resetFields();
-                this.$refs.upload.clearFiles();
-                this.$store.dispatch("getGoodsList");
-                if(this.$route.name!=="goods"){
-                    this.$router.push("/goods")
+            success(res){
+                if(res.ok === 2 || res.ok === 3){
+                    this.$store.commit("OUT_LOGIN")
+                }else if(res.ok === -1){
+                    this.$message.error(res.msg)
+                }else{
+                    this.$refs.myForm.resetFields();
+                    this.$refs.upload.clearFiles();
+                    this.$store.dispatch("getGoodsList");
+                    if(this.$route.name!=="goods"){
+                        this.$router.push("/goods")
+                    }
                 }
+
             },
             submitForm(){
                 if(this.$refs.upload.uploadFiles.length>0){
