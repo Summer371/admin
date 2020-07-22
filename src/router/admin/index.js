@@ -23,6 +23,15 @@ export default [
         meta:{
             isAuthorization:true
         }
-    }
+    },
+    {
+        path: "/adminList",
+        name: "adminList",
+        component: () => import("@/views/admin/adminList"),
+        meta:{
+            isAuthorization:true,
+            permissions:true
+        }
+    },
 
 ]

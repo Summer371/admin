@@ -36,13 +36,6 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-                        label="广告名称"
-                >
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{scope.row.adName}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column
                         label="是否推荐"
                 >
                     <template slot-scope="scope">
@@ -97,21 +90,68 @@
             }
         },
         methods:{
-            changeCurrent(pageIndex=1){
-
+            changeCurrent(v){
+                this.getAdTypeList(v)
             },
             addAdType(){
                 this.$refs.AddAdType.dialogFormVisible=true;
             },
             search(){
+                this.getAdTypeList(1,this.adType)
+            },
+            delAdType(id){
+                this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.delete("/adType",{
+                        params:{
+                            id
+                        }
+                    }).then(data=>{
+                        if(data.ok==1){
+                            this.$message.success(data.msg);
+                            this.getAdTypeList();
+                        }else{
+                            this.$message.error(data.msg)
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
 
             },
-            delAdType(){
-
+            addAd(row){
+                this.$refs.AddAd.dialogFormVisible=true;
+                this.$refs.AddAd.form=row;
+                this.$refs.AddAd.init();
+                this.$refs.AddAd.form.adTypeId=row._id;
             },
-            addAd(){
+            getAdTypeList(pageIndex=1,keyWord=''){
+                this.$axios.get("/adType",{
+                   params:{
+                       pageIndex,
+                       keyWord
+                   }
+                }).then(data=>{
+                    if(data.ok==1){
+                        this.adTypeList=data.data.adTypeList;
+                        this.pageSum=data.data.pageSum;
+                    }else{
+                        this.adTypeList=[]
+                    }
 
+                }).catch(e=>{
+                    this.adTypeList=[]
+                })
             }
+        },
+        mounted() {
+            this.getAdTypeList();
         }
     }
 </script>

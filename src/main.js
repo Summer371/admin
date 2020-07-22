@@ -8,6 +8,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 import  axios from "axios"
 import filter from "@/filters"
 import components from "@/components"
+
+Vue.prototype.$axios=axios;
+
 Vue.use(ElementUI);
 Vue.use(filter);
 Vue.use(components);

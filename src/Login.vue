@@ -23,8 +23,8 @@
                 adminInfo: {
                     adminName: '',
                     passWord: '',
-                    ip:returnCitySN["cip"],
-                    location:returnCitySN["cname"]
+                    ip:returnCitySN["cip"] || "",
+                    location:returnCitySN["cname"] || ''
                 },
                 rules: {
                     adminName: [

@@ -50,7 +50,7 @@ module.exports.count = async function (coll,whereObj = {}) {
     })
 }
 module.exports.getPageInfo = async function (coll,obj={}) {
-    let {whereObj = {}, limit = 5, pageIndex = 1, sort = {}, resultsName = coll} = obj;
+    let {whereObj = {}, limit = 10, pageIndex = 1, sort = {}, resultsName = coll} = obj;
     const count = await this.count(coll, whereObj);
     let pageSum = Math.ceil(count / limit);// 总页数
     if (pageSum < 1) pageSum = 1;

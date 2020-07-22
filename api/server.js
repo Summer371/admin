@@ -62,7 +62,8 @@ app.post("/adminSign", function (req,res) {
         }else{
             db.insertOne("adminList",{
                 adminName,
-                passWord
+                passWord,
+                signTime:Date.now()
             });
             res.json({
                 ok:1,
@@ -71,6 +72,7 @@ app.post("/adminSign", function (req,res) {
         }
     })
 });
+
 app.post("/sendCode",async function (req,res) {
     const phoneId=req.body.phoneId;
     const codeInfo = await  db.findOne("phoneCode",{phoneId});
@@ -126,7 +128,6 @@ app.get("/searchShopList",async function (req,res) {
     }
 });
 app.get("/recommendShopList",async function (req,res) {
-
     const recommendShopList=await db.getPageInfo("shopList",{
         pageIndex:(req.query.pageIndex || 1)/1,
         sort:{"shopPic":-1},
@@ -216,7 +217,7 @@ app.all("*",function (req,res,next) {
 app.get("/adminLog",async function (req,res) {
     let pageIndex=(req.query.pageIndex || 1)/1;
     const count=await db.count("adminLog",{});
-    const pageSize=6;
+    const pageSize=10;
     let pageSum = Math.ceil(count / pageSize);
     if (pageSum < 1) pageSum = 1;
     if (pageIndex < 1) pageIndex = 1;
@@ -267,6 +268,42 @@ app.delete("/adminLog", function (req,res) {
        })
    })
 });
+//管理员列表
+app.get("/adminList",async (req,res)=>{
+        const adminList=await db.find("adminList",{});
+        res.json({
+            ok:1,
+            msg:"管理员列表",
+            adminList
+        })
+});
+
+//管理员权限
+app.post("/permissions",async (req,res)=>{
+    const {adminName,id,permissions}=req.body;
+    db.updateOneById("adminList",id,{
+        $set:{
+            permissions,
+            adminName
+        }
+
+    }).then(()=>{
+        res.json({
+            msg:"修改成功",
+            ok:1
+        })
+    })
+});
+app.delete("/admin",async (req,res)=>{
+    const {id}=req.query;
+    db.deleteOneById("adminList",id).then(()=>{
+        res.json({
+            ok:1,
+            msg:"删除成功"
+        })
+    })
+})
+
 //店铺类型
 app.post("/shopType",async function (req,res) {
         const {newPicName,params} = await upPic(req,"shopTypePic");
@@ -317,7 +354,6 @@ app.get("/shopTypeList",async function (req,res) {
         pageIndex:(req.query.pageIndex || 1)/1,
         sort:{"createTime":-1},
         resultsName:"shopTypeList",
-        limit:4,
         whereObj
     });
     res.json({
@@ -340,17 +376,7 @@ app.post("/shop",async function (req,res) {
     const result=await db.findOne("shopList",{ shopName:params.shopName});
     if(result){
         fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
-            if(err){
-                res.json({
-                    ok:-1,
-                    msg:"删除失败"
-                })
-            }else{
-                res.json({
-                    ok:1,
-                    msg:"删除成功"
-                })
-            }
+
         })
         res.json({
             ok:-1,
@@ -401,7 +427,6 @@ app.get("/shop",async function (req,res) {
         pageIndex:(req.query.pageIndex || 1)/1,
         sort:{createTime:-1},
         resultsName:"shopList",
-        limit:3,
         whereObj
     });
     res.json({
@@ -458,7 +483,6 @@ app.get("/goodsTypeList",async function (req,res) {
     const goodsTypeList=await db.getPageInfo("goodsTypeList",{
         pageIndex:(req.query.pageIndex || 1)/1,
         resultsName:"goodsTypeList",
-        limit:3,
         sort:{createTime:-1},
         whereObj
     });
@@ -488,14 +512,16 @@ app.post("/goods",async function (req,res) {
    // const shopInfo=await db.findOneById("shopList",goodsTypeInfo.shopId);
     const result =await db.find("goodsList",{
         goodsName:params.goodsName,
-    })
+    });
     if(result){
+        fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
+                console.log(err)
+        })
         res.json({
             ok:-1,
-            msg:"商品已存在"
-        })
-        return
-    }
+            msg:"商品名已存在"
+        });
+    }else{
         const goodsTypeInfo = await db.findOneById("goodsTypeList",params.goodsTypeId);
         db.insertOne("goodsList",{
             goodsPic:newPicName,
@@ -518,33 +544,46 @@ app.post("/goods",async function (req,res) {
             })
         });
 
-
+    }
 });
 app.post("/updateGoods",async function(req,res){
     const {newPicName,params} = await upPic(req,"goodsPic");
-    const goodsInfo=await db.findOneById("goodsList",params.updateId);
-    db.updateOneById("goodsList",params.updateId,{
-        $set: {
-            goodsPic: newPicName,
-            goodsName: params.goodsName,
-            goodsType: goodsInfo.shopType,
-            goodsTypeId: goodsInfo.goodsTypeId,
-            shopId: goodsInfo.shopId,
-            shopName: goodsInfo.shopName,
-            shopType: goodsInfo.shopType,
-            shopTypeId: goodsInfo.shopTypeId,
-            goodsOldPrice: params.goodsOldPrice,
-            goodsNewPrice: params.goodsNewPrice,
-            goodsNum: params.goodsNum,
-            isRecommend: params.isRecommend,
-            createTime: Date.now()
-        }
-    }).then(()=>{
-        res.json({
-            ok:1,
-            msg:"修改成功"
+    const result =await db.find("goodsList",{
+        goodsName:params.goodsName,
+    });
+    if(result){
+        fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
+            console.log(err)
         })
-    })
+        res.json({
+            ok:-1,
+            msg:"商品名已存在"
+        });
+    }else{
+        const goodsInfo=await db.findOneById("goodsList",params.updateId);
+        db.updateOneById("goodsList",params.updateId,{
+            $set: {
+                goodsPic: newPicName,
+                goodsName: params.goodsName,
+                goodsType: goodsInfo.shopType,
+                goodsTypeId: goodsInfo.goodsTypeId,
+                shopId: goodsInfo.shopId,
+                shopName: goodsInfo.shopName,
+                shopType: goodsInfo.shopType,
+                shopTypeId: goodsInfo.shopTypeId,
+                goodsOldPrice: params.goodsOldPrice,
+                goodsNewPrice: params.goodsNewPrice,
+                goodsNum: params.goodsNum,
+                isRecommend: params.isRecommend,
+                createTime: Date.now()
+            }
+        }).then(()=>{
+            res.json({
+                ok:1,
+                msg:"修改成功"
+            })
+        })
+    }
 });
 app.get("/goodsList",async function (req,res) {
     const whereObj={};
@@ -555,7 +594,6 @@ app.get("/goodsList",async function (req,res) {
         pageIndex:(req.query.pageIndex || 1)/1,
         sort:{createTime:-1},
         resultsName:"goodsList",
-        limit:3,
         whereObj
     });
     res.json({
@@ -566,20 +604,126 @@ app.get("/goodsList",async function (req,res) {
 
 //广告
 app.post("/adType",async (req,res)=>{
-    const {newPicName,params} = await upPic(req,"adTypePic");
-    const result=await db.insertOne("adTypeList",{
-        shopTypePic:newPicName,
-        shopType:params.shopType
+    // const {newPicName,params} = await upPic(req,"adTypePic");
+    const {adType,isRecommend}=req.body;
+    const result=await db.findOne("adTypeList",{
+        adType
     });
     if(result){
         res.json({
-            ok:1,
-            msg:"上传成功"
+            ok:-1,
+            msg:'广告类别已存在',
+            result
+        })
+    }else{
+        db.insertOne("adTypeList",{
+            //  adTypePic:newPicName,
+            adType,
+            isRecommend,
+            createTime:Date.now()
+        }).then((data)=>{
+            if(data){
+                res.json({
+                    ok:1,
+                    msg:"添加成功"
+                })
+            }else{
+                res.json({
+                    ok:-1,
+                    msg:"添加失败"
+                })
+            }
         })
     }
-
+});
+app.get("/adType",async (req,res)=> {
+    const whereObj={};
+    const keyWord=req.query.keyWord || "";
+    if(keyWord.length>0){
+        whereObj.adName=new RegExp(keyWord);
+    }
+    const data=await db.getPageInfo("adTypeList",{
+        pageIndex:(req.query.pageIndex || 1)/1,
+        sort:{createTime:-1},
+        resultsName:"adTypeList",
+        whereObj
+    });
+    res.json({
+        ok:1,
+        data
+    })
 });
 
+app.get("/adTypeList",async (req,res)=> {
+   const adTypeList=await db.find("adTypeList",{
+       sort:{
+           createTime:-1
+       }
+   });
+    res.json({
+        ok:1,
+        adTypeList
+    })
+});
+
+
+app.post("/advertisement",async (req,res)=>{
+    const {newPicName} = await upPic(req,"adTypePic");
+    const {adName,adType,isRecommend}=req.body;
+    const result=await db.findOne("adList",{
+        adType,
+        adName
+    });
+    if(result){
+        fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
+            console.log(err)
+        })
+        res.json({
+            ok:-1,
+            msg:'此广告已存在',
+            result
+        })
+
+    }else{
+        db.insertOne("adList",{
+            adPic:newPicName,
+            adType,
+            adName,
+            isRecommend,
+            createTime:Date.now()
+        }).then((data)=>{
+            if(data){
+                res.json({
+                    ok:1,
+                    msg:"添加成功"
+                })
+            }else{
+                res.json({
+                    ok:-1,
+                    msg:"添加失败"
+                })
+            }
+        })
+    }
+});
+
+app.get("/advertisement",async (req,res)=> {
+    const whereObj={};
+    const keyWord=req.query.keyWord || "";
+    if(keyWord.length>0){
+        whereObj.adName=new RegExp(keyWord);
+    }
+    const data=await db.getPageInfo("adList",{
+        pageIndex:(req.query.pageIndex || 1)/1,
+        sort:{createTime:-1},
+        resultsName:"adList",
+        whereObj
+    });
+    res.json({
+        ok:1,
+        data
+    })
+});
 //删除
 app.delete("/shopTypeList",async function (req,res) {
     const id=req.query.id;
@@ -626,7 +770,12 @@ app.delete("/goodsType",function (req,res) {
             ok:1,
             msg:"删除成功"
         });
-    });
+    }).catch(()=>{
+        res.json({
+            ok:-1,
+            msg:"删除失败"
+        });
+    })
 });
 app.delete("/goods",async function (req,res) {
     const id=req.query.id;
@@ -654,6 +803,20 @@ app.delete("/goods",async function (req,res) {
         })
     }
 
+});
+app.delete("/adType",function (req,res) {
+    const id=req.query.id;
+    db.deleteOneById("adTypeList",id).then((data)=>{
+        res.json({
+            ok:1,
+            msg:"删除成功"
+        });
+    }).catch(()=>{
+        res.json({
+            ok:-1,
+            msg:"删除失败"
+        });
+    })
 });
 //*********************前端*************************************
 

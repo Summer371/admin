@@ -26,7 +26,7 @@
                 label="日期">
             <template slot-scope="scope">
                 <i class="el-icon-time"></i>
-                <span style="margin-left: 10px">{{ scope.row.handleTime |date }}</span>
+                <span style="margin-left: 10px">{{ scope.row.handleTime | time }}</span>
             </template>
         </el-table-column>
     </el-table>

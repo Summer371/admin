@@ -42,7 +42,6 @@ const actions={
             }
         }).then(()=>{
             this.dispatch("getShopTypeList")
-
         })
     },
     delShop(content,id){

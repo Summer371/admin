@@ -1,6 +1,6 @@
 <template>
     <el-form :model="adminInfo" :rules="rules" ref="adminForm" class="container">
-        <h3>饿了么管理员注册系统</h3>
+        <h3>管理员注册系统</h3>
         <el-form-item  prop="adminName">
             <el-input v-model="adminInfo.adminName" placeholder="管理员账号"></el-input>
         </el-form-item>
@@ -46,6 +46,9 @@
                             message: data.msg,
                             type: data.ok==1 ? "success":"warning"
                         });
+                        this.adminInfo.adminName="";
+                        this.adminInfo.passWord="";
+                        this.$router.push("/adminList")
                     })
                 }
             })

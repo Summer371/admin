@@ -19,7 +19,7 @@
             <el-table
                     v-loading = "$store.state.loading"
                     :border = "true"
-                    :data="$store.state.shop.shopTypeList"
+                    :data="$store.state.shop?$store.state.shop.shopTypeList:null"
                     style="width: 100%">
                 <el-table-column
                         label="店铺类别ID"

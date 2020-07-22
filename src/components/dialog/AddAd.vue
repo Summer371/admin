@@ -1,12 +1,22 @@
 <template>
-    <el-dialog :title="title?'修改店铺':'添加店铺'" :visible.sync="dialogFormVisible" >
+    <el-dialog :title="title?'修改广告':'添加广告'" :visible.sync="dialogFormVisible" >
         <el-form :model="form" ref="myForm">
-            <el-form-item label="店铺名称" prop="shopName" label-width="120px">
-                <el-input v-model="form.shopName" autocomplete="off" style="width: 80%"></el-input>
+            <el-form-item label="广告名称" prop="shopName" label-width="120px">
+                <el-input v-model="form.adName" autocomplete="off" style="width: 80%"></el-input>
             </el-form-item>
-            <el-form-item label="店铺类别" prop="shopTypeId" label-width="120px">
-                <el-select v-model="form.shopTypeId" placeholder="请选择店铺类别">
-                    <el-option v-for="item in $store.state.shop.allShopTypeList" :value="item._id" :label="item.shopType" :key="item._id"></el-option>
+            <el-form-item label="广告类别" prop="shopTypeId" label-width="120px">
+                <el-select v-model="form.adTypeId" placeholder="请选择广告类别">
+                    <el-option v-for="item in adTypeList" :value="item._id" :label="item.adType" :key="item._id"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="店铺类别" prop="goodsType" label-width="120px">
+                <el-select v-model="form.shopTypeId" placeholder="请选择店铺类别" @change="shopTypeChange">
+                    <el-option v-for="item in shopTypeList" :key="item._id" :value="item._id" :label="item.shopType"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="发布店铺" prop="shopId" label-width="120px">
+                <el-select v-model="form.shopId" placeholder="请选择广告类别">
+                    <el-option v-for="item in shopList" :value="item._id" :label="item.shopName" :key="item._id"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="是否推荐" label-width="120px">
@@ -20,7 +30,7 @@
                 :data="form"
                 name="shopPic"
                 :headers="{authorization:$store.state.admin.token}"
-                :action="title?'/ele/updateShop':'/ele/shop'"
+                :action="title?'/ele/updateAdvertisement':'/ele/advertisement'"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"
@@ -45,8 +55,12 @@
                     shopTypeId:"",
                     shopName:"",
                     isRecommend:false,
-                    updateId:''
+                    updateId:'',
+                    adTypeId:''
                 },
+                shopList:[],
+                adTypeList:[],
+                shopTypeList:[],
                 dialogFormVisible:false,
                 title:0
             }
@@ -73,7 +87,45 @@
                     this.$router.push("/shop")
                 }
                 this.$store.dispatch("getShop")
+            },
+            init(){
+                this.$axios.get("/allShopTypeList").then(data=>{
+                    if(data.ok==1){
+                        this.shopTypeList=data.shopTypeList;
+                    }else{
+                        this.shopTypeList=[];
+                    }
+                }).catch(()=>{
+                        this.shopTypeList=[];
+                });
+                this.$axios.get("/adTypeList").then(data=>{
+                    if(data.ok==1){
+                        this.adTypeList=data.adTypeList;
+                    }else{
+                        this.adTypeList=[];
+                    }
+                }).catch(()=>{
+                    this.adTypeList=[];
+                });
+            },
+            shopTypeChange(){
+                this.$sxios.get("/thisTypeShop",{
+                    params:{
+                        id:this.form.shopTypeId
+                    }
+                }).then(data=>{
+                    if(data.ok==1){
+                        this.shopList=data.shopList;
+                    }else{
+                        this.shopList=[];
+                    }
+                }).catch(()=>{
+                    this.shopList=[];
+                });
             }
+        },
+        mounted() {
+
         }
     }
 </script>
