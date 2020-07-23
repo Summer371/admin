@@ -53,6 +53,47 @@ module.exports.enToken = function (payload) {
         }
     },key)
 }
+
+module.exports.dePermissions1=function(permissions){
+    try{
+        if(permissions=="02" || permissions=="01"){
+            return {
+                ok:1,// 正常
+                msg:"权限正常"
+            }
+        }else{
+            return {
+                ok:-1,//
+                msg:"没有权限"
+            }
+        }
+    }catch (err){
+        return {
+            ok:0,// 异常
+            msg:"权限异常"
+        }
+    }
+}
+module.exports.dePermissions2=function(permissions){
+    try{
+        if(permissions=="02" ){
+            return {
+                ok:1,// 正常
+                msg:"权限正常"
+            }
+        }else{
+            return {
+                ok:-1,//
+                msg:"没有权限"
+            }
+        }
+    }catch (err){
+        return {
+            ok:0,// 异常
+            msg:"权限异常"
+        }
+    }
+}
 module.exports.getRandomNum=function(max,min){
     return Math.floor(Math.random()*(max-min+1)+min);
 }

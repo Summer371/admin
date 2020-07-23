@@ -37,7 +37,8 @@ app.post("/adminLogin",function (req,res) {
             res.json({
                 ok:1,
                 adminName,
-                token
+                token,
+                permissions:adminInfo.permissions
             })
         }else{
             tools.json(res,-1,"管理员账号或密码错误")
@@ -48,7 +49,7 @@ app.post("/adminLogin",function (req,res) {
     })
 });
 app.post("/adminSign", function (req,res) {
-    const {adminInfo}= req.body;
+    const {adminInfo,creator}= req.body;
     const adminName=adminInfo.adminName;
     const passWord=tools.md5(adminInfo.passWord);
     db.findOne("adminList",{
@@ -63,6 +64,7 @@ app.post("/adminSign", function (req,res) {
             db.insertOne("adminList",{
                 adminName,
                 passWord,
+                creator,
                 signTime:Date.now()
             });
             res.json({
@@ -240,9 +242,9 @@ app.get("/adminLog",async function (req,res) {
 });
 //管理员操作日志
 app.post("/adminHandle",function (req,res) {
-    const {type,adminName}=req.body;
+    const {type,adminName,msg}=req.body;
     db.insertOne("adminHandle",{
-        type,adminName,
+        type,adminName,msg,
         handleTime:Date.now()
     }).then(()=>{
         res.json({
@@ -278,31 +280,7 @@ app.get("/adminList",async (req,res)=>{
         })
 });
 
-//管理员权限
-app.post("/permissions",async (req,res)=>{
-    const {adminName,id,permissions}=req.body;
-    db.updateOneById("adminList",id,{
-        $set:{
-            permissions,
-            adminName
-        }
 
-    }).then(()=>{
-        res.json({
-            msg:"修改成功",
-            ok:1
-        })
-    })
-});
-app.delete("/admin",async (req,res)=>{
-    const {id}=req.query;
-    db.deleteOneById("adminList",id).then(()=>{
-        res.json({
-            ok:1,
-            msg:"删除成功"
-        })
-    })
-})
 
 //店铺类型
 app.post("/shopType",async function (req,res) {
@@ -442,7 +420,8 @@ app.get("/thisTypeShop",async function (req,res) {
         }
     });
     res.json({
-        thisTypeShopList
+        thisTypeShopList,
+        ok:1
     })
 });
 //商品
@@ -668,10 +647,10 @@ app.get("/adTypeList",async (req,res)=> {
 
 
 app.post("/advertisement",async (req,res)=>{
-    const {newPicName} = await upPic(req,"adTypePic");
-    const {adName,adType,isRecommend}=req.body;
+    const {newPicName,params} = await upPic(req,"adPic");
+    const {adName,adTypeId,isRecommend,shopId}=params;
     const result=await db.findOne("adList",{
-        adType,
+        adTypeId,
         adName
     });
     if(result){
@@ -685,9 +664,16 @@ app.post("/advertisement",async (req,res)=>{
         })
 
     }else{
+        const shopInfo=await db.findOneById("shopList",shopId);
+        const adTypeInfo=await db.findOneById("adTypeList",adTypeId);
         db.insertOne("adList",{
             adPic:newPicName,
-            adType,
+            shopTypeId:shopInfo.shopTypeId,
+            shopName:shopInfo.shopName,
+            shopId:shopInfo.shopId,
+            shopType:shopInfo.shopType,
+            adType:adTypeInfo.adType,
+            adTypeId,
             adName,
             isRecommend,
             createTime:Date.now()
@@ -723,6 +709,25 @@ app.get("/advertisement",async (req,res)=> {
         ok:1,
         data
     })
+});
+app.all("*",function (req,res,next) {
+    res.header("Access-Control-Allow-Origin","*");
+    //允许的header类型
+    res.header("Access-Control-Allow-Headers","content-type");
+    //跨域允许的请求方式
+    res.header("Access-Control-Allow-Methods","DELETE,PUT,POST,GET,OPTIONS");
+    if (req.method.toLowerCase() == 'options')
+        res.send(200);  //让options尝试请求快速结束
+    else {
+        const {ok,msg}=tools.dePermissions1(req.headers.permissions);
+        if(ok==1){
+            next();
+        }else{
+            res.json({
+                ok,msg
+            })
+        }
+    }
 });
 //删除
 app.delete("/shopTypeList",async function (req,res) {
@@ -765,7 +770,7 @@ app.delete("/shop",async function (req,res) {
 });
 app.delete("/goodsType",function (req,res) {
     const id=req.query.id;
-    db.deleteOneById("goodsTypeList",id).then((data)=>{
+    db.deleteOneById("goodsTypeList",id).then(()=>{
         res.json({
             ok:1,
             msg:"删除成功"
@@ -793,7 +798,7 @@ app.delete("/goods",async function (req,res) {
                         ok:1,
                         msg:"删除成功"
                     });
-                }).catch((er)=>res.json({ok:-1,msg:"删除失败"}));
+                }).catch(()=>res.json({ok:-1,msg:"删除失败"}));
             }
         })
     }catch{
@@ -818,8 +823,79 @@ app.delete("/adType",function (req,res) {
         });
     })
 });
-//*********************前端*************************************
+app.delete("/advertisement",async function (req,res) {
+    const id=req.query.id;
+    const info =await db.findOneById("adList",id);
+    try{
+        fs.unlink(__dirname+"/upload/"+info.adPic,async function (err) {
+            if(err){
+                res.json({
+                    ok:-1,
+                    msg:"删除失败"
+                })
+            }else{
+                await db.deleteOneById("adList",info._id).then((data)=>{
+                    res.json({
+                        ok:1,
+                        msg:"删除成功"
+                    });
+                }).catch(()=>res.json({ok:-1,msg:"删除失败"}));
+            }
+        })
+    }catch{
+        res.json({
+            ok:-1,
+            msg:"删除失败"
+        })
+    }
 
+});
+
+app.all("*",function (req,res,next) {
+    res.header("Access-Control-Allow-Origin","*");
+    //允许的header类型
+    res.header("Access-Control-Allow-Headers","content-type");
+    //跨域允许的请求方式
+    res.header("Access-Control-Allow-Methods","DELETE,PUT,POST,GET,OPTIONS");
+    if (req.method.toLowerCase() == 'options')
+        res.send(200);  //让options尝试请求快速结束
+    else {
+        const {ok,msg}=tools.dePermissions2(req.headers.permissions);
+        if(ok==1){
+            next();
+        }else{
+            res.json({
+                ok,msg
+            })
+        }
+    }
+});
+//管理员权限
+app.post("/permissions",async (req,res)=>{
+    const {adminName,id,permissions}=req.body;
+    db.updateOneById("adminList",id,{
+        $set:{
+            permissions,
+            adminName
+        }
+    }).then(()=>{
+        res.json({
+            msg:"修改成功",
+            ok:1
+        })
+    })
+});
+app.delete("/admin",async (req,res)=>{
+    const {id}=req.query;
+    db.deleteOneById("adminList",id).then(()=>{
+        res.json({
+            ok:1,
+            msg:"删除成功"
+        })
+    })
+});
+
+//*********************前端*************************************
 app.listen(8088,function () {
     console.log("server start success on 8088")
 });

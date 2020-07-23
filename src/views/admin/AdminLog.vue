@@ -17,7 +17,7 @@
                 style="width: 100%">
             <el-table-column
                     label="日期"
-                    width="200">
+                    >
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
                     <span style="margin-left: 10px">{{scope.row.createTime | time}}</span>
@@ -25,7 +25,7 @@
             </el-table-column>
             <el-table-column
                     label="管理员"
-                    width="180">
+                    >
                 <template slot-scope="scope">
                     <el-popover trigger="hover" placement="top">
                         <p>姓名: {{ scope.row.adminName }}</p>
@@ -38,7 +38,7 @@
             </el-table-column>
             <el-table-column
                     label="IP"
-                    width="200">
+                    >
                 <template slot-scope="scope">
                     <i class="el-icon-cherry"></i>
                     <span style="margin-left: 10px">{{scope.row.ip}}</span>
@@ -46,18 +46,10 @@
             </el-table-column>
             <el-table-column
                     label="位置"
-                    width="200">
+                   >
                 <template slot-scope="scope">
                     <i class="el-icon-location"></i>
                     <span style="margin-left: 10px">{{scope.row.location}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column
-                    label="权限"
-                    width="200">
-                <template slot-scope="scope">
-                    <i class="el-icon-s-custom"></i>
-                    <span style="margin-left: 10px">{{scope.row.permissions}}</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作">

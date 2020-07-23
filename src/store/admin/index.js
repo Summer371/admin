@@ -4,10 +4,11 @@ const state = {
     token:localStorage.token,
     adminLog:[],
     ip:returnCitySN["cip"] || '',
-    permissions:[]
+    permissions:""
 };
 const mutations={
     CHANGE_ADMIN_TOKEN(state,{adminName,token,permissions}){
+        console.log(adminName,token,permissions)
         state.token=localStorage.token=token;
         state.adminName=localStorage.adminName=adminName;
         state.permissions=localStorage.permissions=permissions;

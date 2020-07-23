@@ -23,21 +23,21 @@
         data(){
             return{
                     adminName:"",
-                    permissions:"0",
+                    permissions:"00",
                 id:"",
                 dialogFormVisible:false,
                 permissionsList:[
                     {
-                        id:"0",
-                        permissions:"全部",
+                        id:"00",
+                        permissions:"普通",
                     },
                     {
-                        id:"1",
+                        id:"01",
                         permissions:"管理"
                     },
                     {
-                        id:"2",
-                        permissions:"用户"
+                        id:"02",
+                        permissions:"全部"
                     }
                 ]
             }
@@ -52,6 +52,7 @@
                     if(data.ok==1){
                         this.$message.success(data.msg);
                         this.dialogFormVisible=false;
+                        this.$parent.getList();
                     }else{
                         this.$message.error(data.msg);
                     }

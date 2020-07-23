@@ -104,7 +104,7 @@
                     }
                 }).then(data=>{
                     if(data.ok==1){
-                        this.adTypeList=data.data.adList;
+                        this.adList=data.data.adList;
                         this.pageSum=data.data.pageSum;
                     }else{
                         this.adTypeList=[]
@@ -114,8 +114,15 @@
                     this.adTypeList=[]
                 })
             },
-            update(){
-
+            update(row){
+                this.$refs.AddAd.dialogFormVisible=true;
+                this.$refs.AddAd.init();
+                this.$refs.AddAd.title=1;
+                this.$refs.AddAd.form.adName=row.adName;
+                this.$refs.AddAd.form.adTypeId=row.adTypeId;
+                this.$refs.AddAd.form.shopTypeId=row.shopTypeId;
+                this.$refs.AddAd.form.shopId=row.shopId;
+                this.$refs.AddAd.shopTypeChange();
             },
             addAd(){
                 this.$refs.AddAd.dialogFormVisible=true;
@@ -127,14 +134,38 @@
             getAdType(){
                 this.$axios.get("/adTypeList").then(data=>{
                     if(data.ok==1){
-                        this.adTypeList=data.data.adTypeList;
+                        this.adTypeList=data.adTypeList;
                     }else{
                         this.adTypeList=[]
                     }
-
-                }).catch(e=>{
+                }).catch(()=>{
                     this.adTypeList=[]
                 })
+            },
+            open(id){
+                this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.delete("/advertisement",{
+                        params:{
+                            id
+                        }
+                    }).then(data=>{
+                        if(data.ok==1){
+                            this.getList();
+                            this.$message.success(data.msg)
+                        }else{
+                            this.$message.error(data.msg)
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
             }
         },
         mounted() {

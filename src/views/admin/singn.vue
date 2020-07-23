@@ -40,7 +40,8 @@
             this.$refs.adminForm.validate( (valid) => {
                 if (valid) {
                     axios.post("/adminSign",{
-                        adminInfo:this.adminInfo
+                        adminInfo:this.adminInfo,
+                        creator:localStorage.adminName || ""
                     }).then((data)=>{
                         this.$message({
                             message: data.msg,

@@ -139,13 +139,18 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then(() => {
-                    this.$store.dispatch("delGoods",id);
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
-                    this.$store.dispatch("adminHandle",{type:"删除商品",adminName:localStorage.adminName});
+                }).then((data) => {
+                    if(data.ok==1){
+                        this.$store.dispatch("delGoods",id);
+                        this.$message({
+                            type: 'success',
+                            message: data.msg
+                        });
+                        this.$store.dispatch("adminHandle",{type:"删除商品",adminName:localStorage.adminName,msg:data.msg});
+                    }else{
+                        this.$message.error(data.msg);
+                        this.$store.dispatch("adminHandle",{type:"删除商品",adminName:localStorage.adminName,msg:data.msg});
+                    }
                 }).catch(() => {
                     this.$message({
                         type: 'info',

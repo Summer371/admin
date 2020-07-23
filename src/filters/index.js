@@ -24,12 +24,12 @@ const filters ={
             (time.getSeconds()).toString().padStart(2,"0");
     },
     permissions(v){
-        if(v=="0"){
-            return "全部"
-        }else if(v=="1"){
+        if(v=="00"){
+            return "普通"
+        }else if(v=="01"){
             return "管理"
-        }else if(v=="2"){
-            return "用户"
+        }else if(v=="02"){
+            return "全部"
         }else if(v=="" || v==undefined){
             return "暂无权限"
         }

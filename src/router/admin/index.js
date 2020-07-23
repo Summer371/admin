@@ -14,6 +14,12 @@ export default [
         component: () => import("@/views/admin/singn"),
         meta:{
             isAuthorization:true
+        },
+        beforeEnter: (to, from, next) => {
+            if(localStorage.permissions!=="02"){
+                return
+            }
+            next();
         }
     },
     {

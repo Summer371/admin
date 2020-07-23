@@ -120,14 +120,16 @@
             },
             update(v){
                 this.$refs.setPermissions.dialogFormVisible=true;
-                this.$refs.setPermissions.id=v.id;
+                this.$refs.setPermissions.id=v._id;
                 this.$refs.setPermissions.adminName=v.adminName;
-                this.$refs.setPermissions.permissions=v.permissions || "0";
+                this.$refs.setPermissions.permissions=v.permissions || "00";
             },
             getList(){
                 this.$axios.get("/adminList").then(data=>{
                     if(data.ok==1){
                         this.adminList=data.adminList;
+                    }else{
+                        this.adminList=[];
                     }
                 })
             }

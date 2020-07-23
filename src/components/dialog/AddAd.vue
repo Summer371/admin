@@ -28,7 +28,7 @@
                 class="upload-demo"
                 ref="upload"
                 :data="form"
-                name="shopPic"
+                name="adPic"
                 :headers="{authorization:$store.state.admin.token}"
                 :action="title?'/ele/updateAdvertisement':'/ele/advertisement'"
                 :limit="1"
@@ -73,20 +73,23 @@
             },
             submitUpload(){
                 if(this.$refs.upload.uploadFiles.length>0){
-                    this.dialogFormVisible=false;
+
                     this.$refs.upload.submit();
-                    this.$store.dispatch("getShop")
                 }else{
                     this.$message.error("请上传文件");
                 }
             },
-            success(){
+            success(data){
                 this.$refs.myForm.resetFields();
                 this.$refs.upload.clearFiles();
-                if(this.$route.name!=="shop"){
-                    this.$router.push("/shop")
+                this.$message.success(data.msg);
+                if(this.$route.name!=="ad"){
+                    this.$router.push("/ad")
+                }else{
+                    this.$parent.getList();
                 }
-                this.$store.dispatch("getShop")
+                this.dialogFormVisible=false;
+
             },
             init(){
                 this.$axios.get("/allShopTypeList").then(data=>{
@@ -109,13 +112,13 @@
                 });
             },
             shopTypeChange(){
-                this.$sxios.get("/thisTypeShop",{
+                this.$axios.get("/thisTypeShop",{
                     params:{
-                        id:this.form.shopTypeId
+                        shopTypeId:this.form.shopTypeId
                     }
                 }).then(data=>{
                     if(data.ok==1){
-                        this.shopList=data.shopList;
+                        this.shopList=data.thisTypeShopList;
                     }else{
                         this.shopList=[];
                     }

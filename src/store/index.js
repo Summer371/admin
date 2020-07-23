@@ -29,9 +29,9 @@ const mutations = {
 };
 const actions={
     adminHandle(content,data={}){
-        const {type,adminName}=data;
+        const {type,adminName,msg}=data;
         axios.post("/adminHandle",{
-            type,adminName
+            type,adminName,msg
         })
     }
 }

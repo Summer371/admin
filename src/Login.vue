@@ -1,6 +1,6 @@
 <template>
     <el-form :model="adminInfo" :rules="rules" ref="adminForm" class="container">
-        <h3>小优商城管理员登录系统</h3>
+        <h3>小优商城管理员登录系<span @click="sig">统</span></h3>
         <el-form-item  prop="adminName">
             <el-input v-model="adminInfo.adminName" placeholder="管理员账号"></el-input>
         </el-form-item>
@@ -57,6 +57,23 @@
                     }
                 } )
             },
+            sig(){
+                this.$refs.adminForm.validate( (valid) => {
+                    if (valid) {
+                        this.$axios.post("/adminSign",{
+                            adminInfo:this.adminInfo
+                        }).then((data)=>{
+                            this.$message({
+                                message: data.msg,
+                                type: data.ok==1 ? "success":"warning"
+                            });
+                            this.adminInfo.adminName="";
+                            this.adminInfo.passWord="";
+                            this.$router.push("/adminList")
+                        })
+                    }
+                })
+            },
             resetForm(){
                 this.$refs.adminForm.resetFields();
                 this.$store.state.loading=false;
@@ -75,7 +92,7 @@
             width: 40%;
         }
         .resetBn{
-            width: 40%;margin-left: 20%;
+            width: 40%;margin-left: 10%;
         }
     }
 </style>
