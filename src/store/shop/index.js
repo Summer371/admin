@@ -26,10 +26,10 @@ const actions={
         commit("GET_ALL_SHOP_TYPE_LIST",shopTypeList);
     },
     async getShop({commit},data={}){
-        const {pageIndex=1,keyWord=""}=data;
+        const {pageIndex=1,keyWord="",type=""}=data;
         const {shopList} =await axios.get("/shop",{
             params:{
-                pageIndex,keyWord
+                pageIndex,keyWord,type
             }
         });
         commit("GET_SHOP",shopList.shopList);

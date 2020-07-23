@@ -3,6 +3,11 @@
         <div class="toolbar">
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
+                    <el-select v-model="goodsType" placeholder="商品类别" @change="select">
+                        <el-option v-for="item in $store.state.goods.goodsTypeList" :value="item.goodsType" :label="item.goodsType" :key="item._id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
                     <el-input v-model="goodsName" placeholder="请输入商品名称"></el-input>
                 </el-form-item>
                 <el-form-item>
@@ -121,10 +126,14 @@
         data(){
             return{
                 goodsName:"",
-                goodsVisible:false
+                goodsVisible:false,
+                goodsType:''
             }
         },
         methods:{
+            select(){
+                this.$store.dispatch("getGoodsList",{keyWord:this.goodsName,type:this.goodsType})
+            },
             search(){
                 this.$store.dispatch("getGoodsList",{keyWord:this.goodsName})
             },
@@ -176,7 +185,8 @@
             }
         },
         mounted(){
-            this.$store.dispatch("getGoodsList")
+            this.$store.dispatch("getGoodsList");
+            this.$store.dispatch("getGoodsType");
         }
 
     }

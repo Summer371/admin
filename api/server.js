@@ -10,6 +10,19 @@ const {upPic} = require("./module/upPic");
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
 //*********************后台*****************************
+app.all("*",function (req,res,next) {
+    res.header("Access-Control-Allow-Origin","*");
+    //允许的header类型
+    res.header("Access-Control-Allow-Headers","content-type");
+    //跨域允许的请求方式
+    res.header("Access-Control-Allow-Methods","DELETE,PUT,POST,GET,OPTIONS");
+    if (req.method.toLowerCase() == 'options')
+        res.sendStatus(200);  //让options尝试请求快速结束
+    else {
+        next();
+    }
+});
+
 //登陆注册
 app.post("/adminLogin",function (req,res) {
     const {adminName,passWord,ip,location}= req.body;
@@ -75,6 +88,7 @@ app.post("/adminSign", function (req,res) {
     })
 });
 
+//********************app登录***************
 app.post("/sendCode",async function (req,res) {
     const phoneId=req.body.phoneId;
     const codeInfo = await  db.findOne("phoneCode",{phoneId});
@@ -112,6 +126,83 @@ app.post("/sendCode",async function (req,res) {
         })
     }
 });
+
+app.post("/userSingn1",function (req,res) {
+    const {phoneId,code}=req.body;
+    if(phoneId=="" || code==""){
+        res.json({
+            ok:-1,
+            msg:"手机号或密码不能为空"
+        })
+        return
+    }
+    db.findOne("phoneCode",{phoneId,code}).then(data=>{
+        if(data){
+            db.insertOne("userList",{
+                phoneId,
+                passWord:tools.md5("123456")
+            }).then(()=>{
+                res.json({
+                    ok:1,
+                    msg:"注册成功,默认密码123456",
+                    token:tools.enToken({
+                                phoneId
+                            })
+                        })
+                    })
+        }else{
+            res.json({
+                ok:-1,
+                msg:"手机号已注册"
+            })
+        }
+    })
+});
+app.post("/userLogin",async (req,res)=>{
+    const {phoneId,passWord}=req.body;
+    const info =await db.findOne("userList",{
+        phoneId,
+        passWord:tools.md5(passWord)
+    });
+    if(info){
+        res.json({
+            ok:1,
+            msg:"登录成功",
+            phoneId,
+            token:tools.enToken(phoneId)
+        })
+    }else{
+        res.json({
+            ok:-1,
+            msg:"账号或密码错误"
+        })
+    }
+});
+app.get("/userSingn2",async (req,res)=>{
+    const {phoneId,passWord}=req.query;
+    const info =await db.insertOne("userList",{
+        phoneId,
+        passWord:tools.md5(passWord),
+        createTime:Date.now()
+    });
+    if(info){
+        res.json({
+            ok:1,
+            msg:"注册成功"
+        })
+    }else{
+        res.json({
+            ok:-1,
+            msg:"注册失败"
+        })
+    }
+});
+
+
+
+//*************************app接口*****************
+
+
 app.get("/searchShopList",async function (req,res) {
     const whereObj={};
     const keyWord=req.query.keyWord || '';
@@ -129,6 +220,8 @@ app.get("/searchShopList",async function (req,res) {
         })
     }
 });
+
+
 app.get("/recommendShopList",async function (req,res) {
     const recommendShopList=await db.getPageInfo("shopList",{
         pageIndex:(req.query.pageIndex || 1)/1,
@@ -140,7 +233,32 @@ app.get("/recommendShopList",async function (req,res) {
     setTimeout(()=>{
         res.json(recommendShopList)
     },1000);
+});
 
+app.get("/tabs_shopType",async (req,res)=>{
+    const result =await db.find("shopTypeList",{});
+    res.json({
+        ok:1,
+        data:result
+    })
+});
+app.get("/tabs_goodsType",async (req,res)=>{
+    const {id}=req.query;
+    const result =await db.find("goodsTypeList",{
+        shopTypeId:id
+    });
+    console.log(result)
+    let data=[];
+    result.forEach(async e=>{
+        let x=await db.find("goodsList",{
+            shopType:e.shopType
+        });
+        data.push(x)
+    })
+    res.json({
+        ok:1,
+        data:data
+    })
 });
 app.get("/swiperShopType",async function (req,res) {
     const limit=(req.query.limit)/1;
@@ -164,6 +282,8 @@ app.get("/swiperShopType",async function (req,res) {
         shopTypeList
     })
 });
+
+
 app.get("/getShopByTypeId/:shopTypeId",async function (req,res) {
     const shopTypeId=req.params.shopTypeId;
     const thisTypeShopList =await db.find("shopList",{
@@ -175,27 +295,14 @@ app.get("/getShopByTypeId/:shopTypeId",async function (req,res) {
         thisTypeShopList
     })
 });
-app.post("/userLogin",function (req,res) {
-    const {phoneId,code}=req.body;
-    db.findOne("phoneCode",{phoneId,code}).then(data=>{
-        if(data){
-                    db.insertOne("userList",{phoneId}).then(()=>{
-                        res.json({
-                            ok:1,
-                            msg:"注册成功",
-                            token:tools.enToken({
-                                phoneId
-                            })
-                        })
-                    })
-                }else{
-                    res.json({
-                        ok:-1,
-                        msg:"手机号已注册"
-                    })
-                }
-            })
-});
+
+
+
+
+////////////*********************后台管理系统**************************
+
+
+
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
     //允许的header类型
@@ -261,15 +368,6 @@ app.get("/check",async function (req,res) {
     })
     res.json(data)
 });
-app.delete("/adminLog", function (req,res) {
-    const id=req.query.id;
-   db.deleteOneById("adminLog",id).then(()=>{
-       res.json({
-           ok:1,
-           msg:"删除成功"
-       })
-   })
-});
 //管理员列表
 app.get("/adminList",async (req,res)=>{
         const adminList=await db.find("adminList",{});
@@ -279,9 +377,6 @@ app.get("/adminList",async (req,res)=>{
             adminList
         })
 });
-
-
-
 //店铺类型
 app.post("/shopType",async function (req,res) {
         const {newPicName,params} = await upPic(req,"shopTypePic");
@@ -398,8 +493,12 @@ app.post("/updateShop",async function (req,res) {
 });
 app.get("/shop",async function (req,res) {
     const whereObj={};
-    if(req.query.keyWord.length>0){
-        whereObj.shopName=new RegExp(req.query.keyWord);
+    const {keyWord,type}=req.query;
+    if(keyWord.length>0){
+        whereObj.shopName=new RegExp(keyWord);
+    }
+    if(type.length>0){
+        whereObj.shopType=new RegExp(type);
     }
     const shopList=await db.getPageInfo("shopList",{
         pageIndex:(req.query.pageIndex || 1)/1,
@@ -566,8 +665,12 @@ app.post("/updateGoods",async function(req,res){
 });
 app.get("/goodsList",async function (req,res) {
     const whereObj={};
-    if(req.query.keyWord.length>0){
-        whereObj.goodsName=new RegExp(req.query.keyWord);
+    const {keyWord,type}=req.query;
+    if(keyWord.length>0){
+        whereObj.goodsName=new RegExp(keyWord);
+    }
+    if(type.length>0){
+        whereObj.goodsType=type;
     }
     const goodsList=await db.getPageInfo("goodsList",{
         pageIndex:(req.query.pageIndex || 1)/1,
@@ -632,7 +735,6 @@ app.get("/adType",async (req,res)=> {
         data
     })
 });
-
 app.get("/adTypeList",async (req,res)=> {
    const adTypeList=await db.find("adTypeList",{
        sort:{
@@ -644,8 +746,6 @@ app.get("/adTypeList",async (req,res)=> {
         adTypeList
     })
 });
-
-
 app.post("/advertisement",async (req,res)=>{
     const {newPicName,params} = await upPic(req,"adPic");
     const {adName,adTypeId,isRecommend,shopId}=params;
@@ -692,12 +792,15 @@ app.post("/advertisement",async (req,res)=>{
         })
     }
 });
-
 app.get("/advertisement",async (req,res)=> {
     const whereObj={};
     const keyWord=req.query.keyWord || "";
+    const type=req.query.type || "";
     if(keyWord.length>0){
         whereObj.adName=new RegExp(keyWord);
+    }
+    if(type.length>0){
+        whereObj.adType=type;
     }
     const data=await db.getPageInfo("adList",{
         pageIndex:(req.query.pageIndex || 1)/1,
@@ -894,7 +997,15 @@ app.delete("/admin",async (req,res)=>{
         })
     })
 });
-
+app.delete("/adminLog", function (req,res) {
+    const id=req.query.id;
+    db.deleteOneById("adminLog",id).then(()=>{
+        res.json({
+            ok:1,
+            msg:"删除成功"
+        })
+    })
+});
 //*********************前端*************************************
 app.listen(8088,function () {
     console.log("server start success on 8088")

@@ -3,12 +3,12 @@
         <div class="toolbar">
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
-                    <el-select v-model="adType" placeholder="广告类别">
-                        <el-option v-for="item in adTypeList" :value="item._id" :label="item.adType" :key="item._id"></el-option>
+                    <el-select v-model="adType" placeholder="广告类别" @change="select">
+                        <el-option v-for="item in adTypeList" :value="item.adType" :label="item.adType" :key="item._id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-input v-model="adminName" placeholder="请输入管理名称"></el-input>
+                    <el-input v-model="adName" placeholder="请输入广告名称"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="search()">查询</el-button>
@@ -89,18 +89,21 @@
                 adTypeList:[],
                 pageSum:0,
                 adList:[],
-                adminName:''
+                adName:''
             }
         },
         methods:{
+            select(){
+                this.getList(1,"",this.adType)
+            },
             changeCurrent(v){
                     this.getList(v)
             },
-            getList(pageIndex=1,keyWord=""){
+            getList(pageIndex=1,keyWord="",type=""){
                 this.$axios.get("/advertisement",{
                     params:{
                         pageIndex,
-                        keyWord
+                        keyWord,type
                     }
                 }).then(data=>{
                     if(data.ok==1){
@@ -110,7 +113,7 @@
                         this.adTypeList=[]
                     }
 
-                }).catch(e=>{
+                }).catch(()=>{
                     this.adTypeList=[]
                 })
             },
@@ -129,7 +132,7 @@
                 this.$refs.AddAd.init();
             },
             search(){
-
+                this.getList(1,this.adName)
             },
             getAdType(){
                 this.$axios.get("/adTypeList").then(data=>{

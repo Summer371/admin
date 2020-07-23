@@ -27,10 +27,10 @@ const actions={
         })
     },
     async getGoodsList({commit},data={}){
-        const {pageIndex=1,keyWord=""}=data;
+        const {pageIndex=1,keyWord="",type=""}=data;
         const {goodsList} =await axios.get("/goodsList",{
             params:{
-                pageIndex,keyWord
+                pageIndex,keyWord,type
             }
         });
         commit("GET_GOODS_LIST",goodsList.goodsList);

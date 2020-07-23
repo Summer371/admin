@@ -3,6 +3,11 @@
         <div class="toolbar">
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
+                    <el-select v-model="form.shopType" placeholder="店铺类别" @change="select">
+                        <el-option v-for="item in $store.state.shop.allShopTypeList" :value="item.shopType" :label="item.shopType" :key="item._id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
                     <el-input v-model="form.shopName" placeholder="请输入店铺的名字"></el-input>
                 </el-form-item>
                 <el-form-item>
@@ -105,6 +110,9 @@
             }
         },
         methods:{
+            select(){
+                this.$store.dispatch("getShop",{keyWord:this.form.shopName,type:this.form.shopType})
+            },
             addShop(){
                 this.$refs.shopCom.dialogFormVisible=true;
                 this.$store.dispatch('getAllShopTypeList');
@@ -159,6 +167,7 @@
         },
         mounted(){
             this.$store.dispatch("getShop");
+            this.$store.dispatch("getAllShopTypeList");
         }
     }
 </script>
