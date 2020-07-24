@@ -102,12 +102,6 @@
                     type: 'warning'
                 }).then(() => {
                     this.$store.dispatch("delShopTypeList",id);
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
-                    this.$store.dispatch("getShopTypeList");
-                    this.$store.dispatch("adminHandle",{type:"删除店铺类别",adminName:localStorage.adminName});
                 }).catch(() => {
                     this.$message({
                         type: 'info',

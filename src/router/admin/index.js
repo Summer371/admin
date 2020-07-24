@@ -17,6 +17,7 @@ export default [
         },
         beforeEnter: (to, from, next) => {
             if(localStorage.permissions!=="02"){
+                alert("您暂时无权访问")
                 return
             }
             next();
@@ -28,6 +29,12 @@ export default [
         component: () => import("@/views/admin/Check"),
         meta:{
             isAuthorization:true
+        },
+        beforeEnter: (to, from, next) => {
+            if(localStorage.permissions!=="02"){
+                return
+            }
+            next();
         }
     },
     {
@@ -39,5 +46,14 @@ export default [
             permissions:true
         }
     },
+    {
+        path: "/location",
+        name: "location",
+        component: () => import("@/views/admin/location"),
+        meta:{
+            isAuthorization:true,
+            permissions:true
+        }
+    }
 
 ]

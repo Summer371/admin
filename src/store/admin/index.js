@@ -8,7 +8,6 @@ const state = {
 };
 const mutations={
     CHANGE_ADMIN_TOKEN(state,{adminName,token,permissions}){
-        console.log(adminName,token,permissions)
         state.token=localStorage.token=token;
         state.adminName=localStorage.adminName=adminName;
         state.permissions=localStorage.permissions=permissions;
@@ -46,9 +45,15 @@ const actions={
     adminLogDel(content,id){
         axios.delete("/adminLog",{
             params:{id}
-        }).then(()=>{
-            this.dispatch("adminLog");
-            this.dispatch("adminHandle",{type:"删除管理员登陆日志",adminName:localStorage.adminName});
+        }).then((data)=>{
+            if(data.ok==1){
+                this.dispatch("adminLog");
+                this.dispatch("adminHandle",{type:"删除管理员登陆日志",adminName:localStorage.adminName,msg:data.msg});
+            }else{
+                this._vm.$message.error(data.msg);
+                this.dispatch("adminHandle",{type:"删除管理员登陆日志",adminName:localStorage.adminName,msg:data.msg});
+            }
+
         })
     }
 }

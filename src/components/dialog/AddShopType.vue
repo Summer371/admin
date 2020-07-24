@@ -70,6 +70,7 @@
                     this.$refs.upload.clearFiles();
                     this.$emit("update:shop-type-visible",false);
                     this.$store.dispatch("getShopTypeList");
+                    this.$store.dispatch("adminHandle",{type:"添加店铺类别",adminName:localStorage.adminName,msg:res.msg});
                     if(this.$route.name==="shopType")
                         this.$store.dispatch("getShopTypeList");
                     else

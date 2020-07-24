@@ -83,6 +83,7 @@
                     }else{
                         this.$message.error(data.msg);
                     }
+                    this.$store.dispatch("adminHandle",{type:"添加广告类别",adminName:localStorage.adminName,msg:data.msg});
                 }).catch(()=>{
 
                 })

@@ -6,9 +6,7 @@
           <el-col class="logo" :span="8" :style="{width:isCollapse?'64px':'240px',transition:'0.8s'}" >
             <strong>小优购物管理系统</strong>
           </el-col>
-          <el-col class="info" :span="8">
-<!--            <i :class="isCollapse?'el-icon-d-arrow-right':'el-icon-d-arrow-left'" @click="isCollapse=!isCollapse"></i>-->
-          </el-col>
+
           <el-col :span="8" class="adminInfo">
             <el-dropdown trigger="click">
                         <span class="el-dropdown-link">
@@ -29,6 +27,8 @@
                 <el-menu-item index="/">管理员日志</el-menu-item>
                 <el-menu-item index="/singn" >注册管理员</el-menu-item>
                 <el-menu-item index="/adminList" >管理员列表</el-menu-item>
+                <el-menu-item index="/check" v-if="admin=='admin'">操作日志</el-menu-item>
+                <el-menu-item index="/location" >地图</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template slot="title"><i class="el-icon-message"></i>店铺设置</template>
@@ -59,7 +59,8 @@
     export default {
         data() {
             return {
-                isCollapse: false
+                isCollapse: false,
+                admin:localStorage.adminName || ""
             }
         }
     }

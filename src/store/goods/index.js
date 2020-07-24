@@ -4,7 +4,8 @@ const state={
     thisTypeShopList:[],
     goodsTypeList:[],
     thisTypeGoodsList:[],
-    goodsList:[]
+    goodsList:[],
+    allGoodsTypeList:[]
 }
 
 const actions={
@@ -24,6 +25,12 @@ const actions={
             }
         }).then(({thisTypeGoodsList})=>{
             commit("CHANGE_THIS_TYPE_GOODS_LIST",thisTypeGoodsList)
+        })
+    },
+    getAllTypeGoods({commit}){
+        axios.get("/allGoodsTypeList",{
+        }).then(({AllTypeGoodsList})=>{
+            commit("CHANGE_ALL_TYPE_GOODS_LIST",AllTypeGoodsList)
         })
     },
     async getGoodsList({commit},data={}){
@@ -60,8 +67,20 @@ const actions={
         params:{
             id
         }
-    }).then(()=>{
-        this.dispatch("getGoodsList");
+    }).then((data)=>{
+        if(data.ok==1){
+            this.dispatch("getGoodsList");
+            this.dispatch("adminHandle",{type:"删除商品",adminName:localStorage.adminName,msg:data.msg});
+            this._vm.$message({
+                type: 'success',
+                message: '删除成功!'
+            });
+        }else{
+            this._vm.$message({
+                type: 'error',
+                message: '删除失败!'
+            });
+        }
     })
 }
 };
@@ -79,6 +98,9 @@ const mutations={
     },
     GET_GOODS_LIST(state,goodsList){
         state.goodsList=goodsList;
+    },
+    CHANGE_ALL_TYPE_GOODS_LIST(state,allGoodsTypeList){
+        state.allGoodsTypeList=allGoodsTypeList;
     }
 }
 

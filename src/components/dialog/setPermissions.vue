@@ -53,6 +53,7 @@
                         this.$message.success(data.msg);
                         this.dialogFormVisible=false;
                         this.$parent.getList();
+                        this.$store.dispatch("adminHandle",{type:"修改管理权限",adminName:localStorage.adminName,msg:data.msg});
                     }else{
                         this.$message.error(data.msg);
                     }

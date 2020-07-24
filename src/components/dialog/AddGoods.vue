@@ -92,7 +92,8 @@
                 }else{
                     this.$refs.myForm.resetFields();
                     this.$refs.upload.clearFiles();
-                    this.$store.dispatch("adminHandle",{type:"修改商品",adminName:localStorage.adminName,msg:res.msg});
+                    this.$message.success(res.msg)
+                    this.$store.dispatch("adminHandle",{type:this.title?'修改商品':'添加商品',adminName:localStorage.adminName,msg:res.msg});
                     this.$store.dispatch("getGoodsList");
                     if(this.$route.name!=="goods"){
                         this.$router.push("/goods")

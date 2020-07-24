@@ -88,11 +88,6 @@
                     type: 'warning'
                 }).then(() => {
                     this.$store.dispatch("adminLogDel", id);
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
-                    this.$store.dispatch("adminLog");
                 }).catch(() => {
                     this.$message({
                         type: 'info',

@@ -141,6 +141,7 @@
                     }else{
                         this.adTypeList=[]
                     }
+
                 }).catch(()=>{
                     this.adTypeList=[]
                 })
@@ -162,6 +163,7 @@
                         }else{
                             this.$message.error(data.msg)
                         }
+                        this.dispatch("adminHandle",{type:"删除",adminName:localStorage.adminName,msg:data.msg});
                     })
                 }).catch(() => {
                     this.$message({

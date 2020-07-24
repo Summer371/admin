@@ -50,8 +50,13 @@
             submitForm(){
                 if(this.form.goodsType.length>0){
                     this.dialogFormVisible=false;
-                    axios.post("/goodsType",this.form).then(()=>{
-                        this.success()
+                    axios.post("/goodsType",this.form).then((data)=>{
+                        if(data.ok==1){
+                            this.success(data)
+                        }else{
+                            this.$message.error("添加失败");
+                        }
+
                     })
                 }else{
                     this.$message.error("请输入商品类别");
@@ -62,10 +67,13 @@
                 this.form.shopId="";
                 this.$store.dispatch("getThisShop",{shopTypeId:this.form.shopTypeId})
             },
-            success(){
+            success(data){
+                this.$message.success("添加成功");
+                this.form.goodsType="";
                 if(this.$route.name!=="goodsType"){
                     this.$router.push("/goodsType")
                 }
+                this.$store.dispatch("adminHandle",{type:"添加商品类别",adminName:localStorage.adminName,msg:data.msg});
                 this.$store.dispatch("getGoodsType")
             }
         },

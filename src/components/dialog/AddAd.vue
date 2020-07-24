@@ -89,7 +89,7 @@
                     this.$parent.getList();
                 }
                 this.dialogFormVisible=false;
-
+                this.$store.dispatch("adminHandle",{type:"添加广告类别",adminName:localStorage.adminName,msg:data.msg});
             },
             init(){
                 this.$axios.get("/allShopTypeList").then(data=>{

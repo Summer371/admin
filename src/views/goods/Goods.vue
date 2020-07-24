@@ -4,7 +4,7 @@
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
                     <el-select v-model="goodsType" placeholder="商品类别" @change="select">
-                        <el-option v-for="item in $store.state.goods.goodsTypeList" :value="item.goodsType" :label="item.goodsType" :key="item._id"></el-option>
+                        <el-option v-for="item in $store.state.goods.allGoodsTypeList" :value="item._id" :label="item.goodsType" :key="item._id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -148,18 +148,9 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then((data) => {
-                    if(data.ok==1){
+                }).then(() => {
                         this.$store.dispatch("delGoods",id);
-                        this.$message({
-                            type: 'success',
-                            message: data.msg
-                        });
-                        this.$store.dispatch("adminHandle",{type:"删除商品",adminName:localStorage.adminName,msg:data.msg});
-                    }else{
-                        this.$message.error(data.msg);
-                        this.$store.dispatch("adminHandle",{type:"删除商品",adminName:localStorage.adminName,msg:data.msg});
-                    }
+
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -186,7 +177,7 @@
         },
         mounted(){
             this.$store.dispatch("getGoodsList");
-            this.$store.dispatch("getGoodsType");
+            this.$store.dispatch("getAllTypeGoods");
         }
 
     }

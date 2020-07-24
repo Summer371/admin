@@ -242,22 +242,32 @@ app.get("/tabs_shopType",async (req,res)=>{
         data:result
     })
 });
+
+//
 app.get("/tabs_goodsType",async (req,res)=>{
     const {id}=req.query;
     const result =await db.find("goodsTypeList",{
-        shopTypeId:id
+        whereObj:{
+            shopTypeId:mongodb.ObjectId(id)
+        }
     });
-    console.log(result)
-    let data=[];
-    result.forEach(async e=>{
-        let x=await db.find("goodsList",{
-            shopType:e.shopType
-        });
-        data.push(x)
-    })
     res.json({
         ok:1,
-        data:data
+        data:result
+    })
+});
+
+app.get("/tabs_goods",async (req,res)=>{
+    const {id}=req.query;
+    const result =await db.find("goodsList",{
+        whereObj:{
+            goodsTypeId:mongodb.ObjectId(id)
+        }
+
+    });
+    res.json({
+        ok:1,
+        data:result
     })
 });
 app.get("/swiperShopType",async function (req,res) {
@@ -361,12 +371,17 @@ app.post("/adminHandle",function (req,res) {
     })
 });
 app.get("/check",async function (req,res) {
-    const data=await db.find("adminHandle",{
+    const {pageIndex}=req.query;
+    const data=await db.getPageInfo("adminHandle",{
         sort:{
             handleTime:-1
-        }
+        },
+        pageIndex
+    });
+    res.json({
+        ok:1,
+        data
     })
-    res.json(data)
 });
 //管理员列表
 app.get("/adminList",async (req,res)=>{
@@ -427,7 +442,7 @@ app.get("/shopTypeList",async function (req,res) {
         pageIndex:(req.query.pageIndex || 1)/1,
         sort:{"createTime":-1},
         resultsName:"shopTypeList",
-        whereObj
+        whereObj,limit:5
     });
     res.json({
         ok:1,
@@ -569,6 +584,21 @@ app.get("/goodsTypeList",async function (req,res) {
         goodsTypeList
     })
 });
+app.get("/allGoodsTypeList",async function (req,res) {
+    const AllTypeGoodsList=await db.find("goodsTypeList",{
+        sort:{createTime:-1}
+    });
+    const arr=[
+        {
+            goodsType:"全部",
+            _id:""
+        }
+    ]
+    res.json({
+        ok:1,
+        AllTypeGoodsList:[...AllTypeGoodsList,...arr]
+    })
+});
 app.get("/thisTypeGoods",async function (req,res) {
     const shopId=req.query.shopId;
     const thisTypeGoodsList =await db.find("goodsTypeList",{
@@ -588,8 +618,9 @@ app.post("/goods",async function (req,res) {
     const {newPicName,params} = await upPic(req,"goodsPic");
 
    // const shopInfo=await db.findOneById("shopList",goodsTypeInfo.shopId);
-    const result =await db.find("goodsList",{
+    const result =await db.findOne("goodsList",{
         goodsName:params.goodsName,
+        shopName:params.shopName
     });
     if(result){
         fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
@@ -604,7 +635,7 @@ app.post("/goods",async function (req,res) {
         db.insertOne("goodsList",{
             goodsPic:newPicName,
             goodsName:params.goodsName,
-            goodsType:goodsTypeInfo.shopType,
+            goodsType:goodsTypeInfo.goodsType,
             goodsTypeId:goodsTypeInfo._id,
             shopId:goodsTypeInfo.shopId,
             shopName:goodsTypeInfo.shopName,
@@ -618,7 +649,7 @@ app.post("/goods",async function (req,res) {
         }).then(()=>{
             res.json({
                 ok:1,
-                msg:"上传成功"
+                msg:"添加成功"
             })
         });
 
@@ -670,7 +701,7 @@ app.get("/goodsList",async function (req,res) {
         whereObj.goodsName=new RegExp(keyWord);
     }
     if(type.length>0){
-        whereObj.goodsType=type;
+        whereObj.goodsTypeId=type;
     }
     const goodsList=await db.getPageInfo("goodsList",{
         pageIndex:(req.query.pageIndex || 1)/1,

@@ -40,8 +40,21 @@ const actions={
             params:{
                 id
             }
-        }).then(()=>{
-            this.dispatch("getShopTypeList")
+        }).then((data)=>{
+            if(data.ok==1){
+                this.dispatch("getShopTypeList");
+                this.dispatch("adminHandle",{type:"删除店铺类别",adminName:localStorage.adminName,msg:data.msg});
+                this._vm.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            }else{
+                this._vm.$message({
+                    type: 'error',
+                    message: '删除失败!'
+                });
+            }
+
         })
     },
     delShop(content,id){
@@ -49,8 +62,20 @@ const actions={
             params:{
                 id
             }
-        }).then(()=>{
-            this.dispatch("getShop")
+        }).then((data)=>{
+            if(data.ok==1){
+                this.dispatch("getShop")
+                this.dispatch("adminHandle",{type:"删除店铺",adminName:localStorage.adminName,msg:data.msg});
+                this._vm.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            }else{
+                this._vm.$message({
+                    type: 'error',
+                    message: '删除失败!'
+                });
+            }
         })
     }
 };

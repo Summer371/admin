@@ -66,9 +66,10 @@
                     this.$message.error("请上传文件");
                 }
             },
-            success(){
+            success(data){
                 this.$refs.myForm.resetFields();
                 this.$refs.upload.clearFiles();
+                this.$store.dispatch("adminHandle",{type:"添加店铺",adminName:localStorage.adminName,msg:data.msg});
                 if(this.$route.name!=="shop"){
                     this.$router.push("/shop")
                 }
