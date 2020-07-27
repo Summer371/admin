@@ -1,6 +1,20 @@
 <template>
     <div>
+        <div class="toolbar">
+            <el-form :inline="true"  class="demo-form-inline">
+                <el-form-item>
+                    <el-input v-model="userName" placeholder="请输入用户名"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="search()">查询</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="success" @click="addUser">添加用户</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
         <div class="map" id="map"></div>
+        <addUser ref="addUser"></addUser>
     </div>
 </template>
 
@@ -11,84 +25,88 @@
         data(){
             return{
                     // data中,location是地理编码，color 1绿2黄3红
-                dataList: [
-                    { location: "113.772,22.785", color: 1 },
-                    { location: "114.772,22.785", color: 3 },
-                    { location: "116.410778,39.897614", color: 2 },
-                    { location: "123.499706,41.857793", color: 2 },
-                    { location: "111.722363,40.868346", color: 1 },
-                    { location: "103.987988,30.662124", color: 3 }
-                ]
+                map:null,
+                markers:[],
+                userName:"",
+                locationList:[]
             }
         },
         methods:{
             MapInit () {
                 let _this = this;
-                let map = new AMap.Map("map", {
-                    center: [105.397428, 35.90923],
-                    mapStyle: "amap://styles/bb7f5165253f57515d7ba226b25ad7ec", //设置地图的显示样式
+                this.map = new AMap.Map("map", {
+                    center: [113.506293,33.26691],
+                    mapStyle: "amap://styles/d6bf8c1d69cea9f5c696185ad4ac4c86", //设置地图的显示样式
                     resizeEnable: true,
-                    zoom: 5
+                    zoom: 18
                 });
-                const style = [
-                    {
-                        // 1
-                        url: "此处放一张图的url",
-                        anchor: new AMap.Pixel(5, 5),   // 位移
-                        size: new AMap.Size(10, 10) // 图片大小
-                    },
-                    {
-                        // 2
-                        url: "此处放另外一张图的url",
-                        anchor: new AMap.Pixel(5, 5),
-                        size: new AMap.Size(10, 10)
-                    },
-                    {
-                        // 3
-                        url: "此处再放一张图的url",
-                        anchor: new AMap.Pixel(5, 5),
-                        size: new AMap.Size(10, 10)
-                    }
-                ];
-
-                let locationData = []; //存放经纬度的数组
-                let status = null;
-                for (let i = 0; i < _this.dataList.length; i++) {
-                    let locationArr = _this.dataList[i].location.split(",");
-// 判断需要展示的颜色类型
-                    if (_this.dataList[i].dataList === 1) {
-                        status = 0; //根据下标来相对应样式 例如：绿色对应style数组中的第0个样式
-                    } else if (_this.dataList[i].color === 2) {
-                        status = 1;
-                    } else if (_this.dataList[i].color === 3) {
-                        status = 2;
-                    }
-
-                    locationData.push({
-                        lnglat: locationArr,
-                        style: status // 对应的status相对应的样式 style
+                this.map.on("contextmenu",(e)=>{
+                    this.marker(1,e);
+                })
+            },
+            marker(type,e){
+                let _this = this;
+                if(type==0){
+                    let icon = new AMap.Icon({
+                        size: new AMap.Size(38, 40),    // 图标尺寸
+                        image: 'ele'+e.headImg,  // Icon的图像地址
+                        imageSize: new AMap.Size(38, 40)   // 根据所设置的大小拉伸或压缩图片
                     });
+                    var marker = new AMap.Marker({
+                        map:_this.map,
+                        position: new AMap.LngLat(e.lng,e.lat),
+                        title: e.userName,
+                        offset: new AMap.Pixel(10, 10),
+                        icon,
+                    });
+                }else if(type==1){
+                    let {lng,lat}=e.lnglat;
+                    var marker = new AMap.Marker({
+                        map:_this.map,
+                        position: new AMap.LngLat(lng,lat),
+                        title: '添加位置'
+                    });
+                    marker.on("click",e=>{
+                        _this.setLocation(e)
+                    })
                 }
-
-// 点放置
-                let mass = new AMap.MassMarks(locationData, {
-                    opacity: 0.8,
-                    zIndex: 111,
-                    cursor: "pointer",
-                    style: style
+            },
+            newIcon(){
+                let icon = new AMap.Icon({
+                    size: new AMap.Size(58, 70),    // 图标尺寸
+                    image: 'http://localhost:8080/static/img/patrol.png',  // Icon的图像地址
+                    imageSize: new AMap.Size(58, 70)   // 根据所设置的大小拉伸或压缩图片
                 });
+            },
+            setLocation(e){
+                let {lng,lat}=e.lnglat;
+                this.$refs.addUser.dialogFormVisible=true;
+                this.$refs.addUser.form.lng=lng;
+                this.$refs.addUser.form.lat=lat;
+            },
+            search(){
 
-                let marker = new AMap.Marker({ content: " ", map: map });
-                mass.on("mouseover", function(e) {
-                    marker.setPosition(e.data.lnglat); //用户相对应的经纬度
-                    marker.setLabel({ content: e.data.name }); //用户相对应的名字
-                });
+            },
+            addUser(){
 
-                mass.setMap(map);
+            },
+            getLocation(){
+                this.$axios.get("/locationList").then(data=>{
+                    if(data.ok==1){
+                        this.locationList=data.locationList;
+                        this.locationList.forEach(e=>{
+                            this.marker(0,e);
+                        })
+
+                    }else{
+                        this.locationList=[]
+                    }
+                })
             }
         },
         mounted() {
             this.MapInit();
+           this.getLocation();
         }
     }
 </script>
@@ -97,4 +115,5 @@
 .map{
     height: 800px;width: 100%;
 }
+
 </style>

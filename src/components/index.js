@@ -7,7 +7,8 @@ const components = {
     AddGoods:()=>import("@/components/dialog/AddGoods"),
     AddAd:()=>import("@/components/dialog/AddAd"),
     AddAdType:()=>import("@/components/dialog/AddAdType"),
-    setPermissions:()=>import("@/components/dialog/setPermissions")
+    setPermissions:()=>import("@/components/dialog/setPermissions"),
+    addUser:() =>import("@/components/dialog/addUser")
 }
 export default {
     install(Vue){

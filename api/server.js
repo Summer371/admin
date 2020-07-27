@@ -844,6 +844,47 @@ app.get("/advertisement",async (req,res)=> {
         data
     })
 });
+
+
+//添加位置信息
+app.post("/Location",async (req,res)=>{
+    const {newPicName,params} = await upPic(req,"headImg");
+    const {userName,phone,lng,lat}=params;
+    db.insertOne("locationList",{
+        userName,
+        phone,
+        headImg:newPicName,
+        lng,
+        lat,
+        createTime:Date.now()
+    }).then((data)=>{
+        if(data){
+            res.json({
+                ok:1,
+                msg:userName+"位置信息添加成功"
+            })
+        }else{
+            res.json({
+                ok:-1,
+                msg:"添加失败"
+            })
+        }
+    })
+
+});
+app.get("/locationList",async (req,res)=>{
+    const locationList=await db.find("locationList",{
+        sort:{
+            createTime:-1
+        }
+    })
+    res.json({
+        ok:1,
+        locationList
+    })
+
+});
+
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
     //允许的header类型

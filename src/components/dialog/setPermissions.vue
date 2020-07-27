@@ -2,7 +2,7 @@
     <el-dialog title="管理员权限" :visible.sync="dialogFormVisible" >
         <el-form  ref="myForm">
             <el-form-item label="管理名称" prop="adminName" label-width="120px">
-                <el-input v-model="adminName" autocomplete="off" style="width: 80%"></el-input>
+                <el-input v-model="adminName" autocomplete="off" style="width: 80%" disabled></el-input>
             </el-form-item>
             <el-form-item label="管理权限" prop="permissions" label-width="120px">
                 <el-select v-model="permissions" placeholder="请选择管理权限">

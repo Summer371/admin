@@ -94,5 +94,11 @@
         .resetBn{
             width: 40%;margin-left: 10%;
         }
+
+    }
+</style>
+<style>
+    .el-input__inner{
+        height: 38px!important;
     }
 </style>
