@@ -11,6 +11,9 @@
                 <el-form-item>
                     <el-button type="success" @click="addUser">添加用户</el-button>
                 </el-form-item>
+                <el-form-item>
+                    <span><b>说明:</b> 鼠标单击右键选定位置，单击位置坐标添加用户信息</span>
+                </el-form-item>
             </el-form>
         </div>
         <div class="map" id="map"></div>
@@ -28,17 +31,18 @@
                 map:null,
                 markers:[],
                 userName:"",
-                locationList:[]
+                locationList:[],
+                locationInfo:{}
             }
         },
         methods:{
             MapInit () {
                 let _this = this;
                 this.map = new AMap.Map("map", {
-                    center: [113.506293,33.26691],
+                    center: [113.65, 34.76],//113.65, 34.76   ///113.506293,33.26691
                     mapStyle: "amap://styles/d6bf8c1d69cea9f5c696185ad4ac4c86", //设置地图的显示样式
                     resizeEnable: true,
-                    zoom: 18
+                    zoom: 10
                 });
                 this.map.on("contextmenu",(e)=>{
                     this.marker(1,e);
@@ -55,7 +59,7 @@
                     var marker = new AMap.Marker({
                         map:_this.map,
                         position: new AMap.LngLat(e.lng,e.lat),
-                        title: e.userName,
+                        title: e.userName+e.phone,
                         offset: new AMap.Pixel(10, 10),
                         icon,
                     });
@@ -71,13 +75,6 @@
                     })
                 }
             },
-            newIcon(){
-                let icon = new AMap.Icon({
-                    size: new AMap.Size(58, 70),    // 图标尺寸
-                    image: 'http://localhost:8080/static/img/patrol.png',  // Icon的图像地址
-                    imageSize: new AMap.Size(58, 70)   // 根据所设置的大小拉伸或压缩图片
-                });
-            },
             setLocation(e){
                 let {lng,lat}=e.lnglat;
                 this.$refs.addUser.dialogFormVisible=true;
@@ -85,28 +82,69 @@
                 this.$refs.addUser.form.lat=lat;
             },
             search(){
+                   this.$axios.get("/locationSearch",{
+                       params:{
+                           userName:this.userName
+                       }
+                   }) .then(data=>{
+                       if(data.ok==1){
+                           this.map.setCenter([data.locationList[0].lng,data.locationList[0].lat]);
+                           this.map.setZoom(18)
 
+                       }
+                   })
             },
             addUser(){
 
             },
-            getLocation(){
+            getLocationList(){
                 this.$axios.get("/locationList").then(data=>{
                     if(data.ok==1){
                         this.locationList=data.locationList;
                         this.locationList.forEach(e=>{
                             this.marker(0,e);
                         })
-
                     }else{
                         this.locationList=[]
                     }
                 })
+            },
+            getLocation(){
+                var map,geolocation;
+                let _this=this;
+                map = new AMap.Map('container', {
+                    resizeEnable: true
+                });
+                map.plugin('AMap.Geolocation', function() {
+                    geolocation = new AMap.Geolocation({
+                        enableHighAccuracy: true,//是否使用高精度定位，默认:true
+                        timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+                        buttonPosition:'RB',    //定位按钮的停靠位置
+                        buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                        zoomToAccuracy: true,   //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                    });
+                    map.addControl(geolocation);
+                    geolocation.getCurrentPosition();
+                    AMap.event.addListener(geolocation, 'complete', _this.onComplete); //返回定位信息
+                    AMap.event.addListener(geolocation, 'error', _this.onError); //返回定位出错信息
+                });
+
+            },
+            onComplete(data){
+                this.locationInfo=data;
+                let {lng,lat}=data.position;
+                this.map.setCenter([lng,lat]);
+                this.map.setZoom(18);
+                this.marker(1,{lnglat:{lng,lat}})
+            },
+            onError(data){
+                console.log(data)
             }
         },
         mounted() {
             this.MapInit();
            this.getLocation();
+            this.getLocationList();
         }
     }
 </script>

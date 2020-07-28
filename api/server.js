@@ -885,6 +885,21 @@ app.get("/locationList",async (req,res)=>{
 
 });
 
+app.get("/locationSearch",async (req,res)=>{
+    const {userName}=req.query;
+    const whereObj={};
+    whereObj.userName=new RegExp(userName);
+    const locationList=await db.find("locationList",{
+            whereObj
+        }
+        );
+    res.json({
+        ok:1,
+        locationList
+    })
+
+});
+
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
     //允许的header类型

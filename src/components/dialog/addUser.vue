@@ -60,7 +60,8 @@
             },
             success(data){
                 this.dialogFormVisible=false;
-                this.$parent.getLocation();
+                this.$parent.getLocationList();
+                this.$store.dispatch("adminHandle",{type:"添加用户位置",adminName:localStorage.adminName,msg:data.msg});
                 this.$message.success(data.msg)
             }
         }
