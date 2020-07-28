@@ -30,7 +30,7 @@
                 :data="form"
                 name="adPic"
                 :headers="{authorization:$store.state.admin.token}"
-                :action="title?'/ele/updateAdvertisement':'/ele/advertisement'"
+                :action="title?'/updateAdvertisement':'/advertisement'"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"

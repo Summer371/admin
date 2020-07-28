@@ -23,12 +23,13 @@
         <el-aside width="200px">
           <el-menu :default-active="$route.path" :collapse="isCollapse" :collapse-transition="false" :router="true">
             <el-submenu index="1">
-              <template slot="title"><i class="el-icon-user"></i>管理员</template>
+              <template slot="title"><i class="el-icon-user"></i>管理设置</template>
                 <el-menu-item index="/">管理员日志</el-menu-item>
                 <el-menu-item index="/singn" >注册管理员</el-menu-item>
                 <el-menu-item index="/adminList" >管理员列表</el-menu-item>
                 <el-menu-item index="/check" v-if="admin=='admin'">操作日志</el-menu-item>
-                <el-menu-item index="/location" >地图</el-menu-item>
+                <el-menu-item index="/userList" >成员列表</el-menu-item>
+                <el-menu-item index="/location" >成员分散地图</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template slot="title"><i class="el-icon-message"></i>店铺设置</template>

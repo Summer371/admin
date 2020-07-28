@@ -13,7 +13,7 @@ app.use(express.static(__dirname+"/upload"));
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
     //允许的header类型
-    res.header("Access-Control-Allow-Headers","content-type");
+    res.header("Access-Control-Allow-Headers","*");
     //跨域允许的请求方式
     res.header("Access-Control-Allow-Methods","DELETE,PUT,POST,GET,OPTIONS");
     if (req.method.toLowerCase() == 'options')
@@ -876,8 +876,8 @@ app.get("/locationList",async (req,res)=>{
     const locationList=await db.find("locationList",{
         sort:{
             createTime:-1
-        }
-    })
+        },
+    });
     res.json({
         ok:1,
         locationList
@@ -903,7 +903,7 @@ app.get("/locationSearch",async (req,res)=>{
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
     //允许的header类型
-    res.header("Access-Control-Allow-Headers","content-type");
+    res.header("Access-Control-Allow-Headers","*");
     //跨域允许的请求方式
     res.header("Access-Control-Allow-Methods","DELETE,PUT,POST,GET,OPTIONS");
     if (req.method.toLowerCase() == 'options')
@@ -919,6 +919,27 @@ app.all("*",function (req,res,next) {
         }
     }
 });
+
+app.get('/allLocationList',async (req,res)=>{
+    const whereObj={};
+    const keyWord=req.query.keyWord || "";
+    if(keyWord.length>0){
+        whereObj.userName=new RegExp(keyWord);
+    }
+    const data=await db.getPageInfo("locationList",{
+        pageIndex:(req.query.pageIndex || 1)/1,
+        sort:{createTime:-1},
+        resultsName:"locationList",
+        whereObj
+    });
+    res.json({
+        ok:1,
+        data
+    })
+
+});
+
+
 //删除
 app.delete("/shopTypeList",async function (req,res) {
     const id=req.query.id;
@@ -1084,6 +1105,35 @@ app.delete("/admin",async (req,res)=>{
         })
     })
 });
+
+app.delete("/userLocation",async (req,res)=>{
+    const {id}=req.query;
+    const info =await db.findOneById("locationList",id);
+    try{
+        fs.unlink(__dirname+"/upload/"+info.headImg,async function (err) {
+            if(err){
+                res.json({
+                    ok:-1,
+                    msg:"删除失败"
+                })
+            }else{
+                db.deleteOneById("locationList",id).then(()=>{
+                    res.json({
+                        ok:1,
+                        msg:"删除成功"
+                    })
+                }).catch(()=>res.json({ok:-1,msg:"删除失败"}));
+            }
+        })
+    }catch{
+        res.json({
+            ok:-1,
+            msg:"删除失败"
+        })
+    }
+
+});
+
 app.delete("/adminLog", function (req,res) {
     const id=req.query.id;
     db.deleteOneById("adminLog",id).then(()=>{

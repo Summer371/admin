@@ -24,7 +24,7 @@ axios.interceptors.request.use(config=>{
         }
     }
     store.commit("CHANGE_LOADING",true);
-    config.url = "/ele"+config.url;
+    config.url = "http://47.98.238.74:8088"+config.url;///47.98.238.74
     return config;
 })
 //响应拦截

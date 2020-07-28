@@ -12,7 +12,7 @@
                     <el-button type="success" @click="addUser">添加用户</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <span><b>说明:</b> 鼠标单击右键选定位置，单击位置坐标添加用户信息</span>
+                    <span style="color:red"><b>说明:</b> 在地图上鼠标单击右键选定位置，单击位置坐标添加用户信息</span>
                 </el-form-item>
             </el-form>
         </div>
@@ -32,7 +32,8 @@
                 markers:[],
                 userName:"",
                 locationList:[],
-                locationInfo:{}
+                locationInfo:{},
+                infoWindow:null
             }
         },
         methods:{
@@ -53,16 +54,26 @@
                 if(type==0){
                     let icon = new AMap.Icon({
                         size: new AMap.Size(38, 40),    // 图标尺寸
-                        image: 'ele'+e.headImg,  // Icon的图像地址
+                        image: 'http://47.98.238.74:8088/'+e.headImg,  // Icon的图像地址
                         imageSize: new AMap.Size(38, 40)   // 根据所设置的大小拉伸或压缩图片
                     });
                     var marker = new AMap.Marker({
                         map:_this.map,
                         position: new AMap.LngLat(e.lng,e.lat),
-                        title: e.userName+e.phone,
+                        title: e.userName,
                         offset: new AMap.Pixel(10, 10),
                         icon,
                     });
+                    let mapContent= `<div class="sp11 " style="width: 65%"><h5 class="sp12">${e.userName}</h5><h5 class="sp12">${e.phone}</h5></div>`;
+                    var infoWindow = new AMap.InfoWindow({
+                        content: mapContent,
+                        autoMove: false,
+                        offset: new AMap.Pixel(0, -10)
+                    });
+                    marker.on("click",()=>{
+                        // 打开信息窗口
+                       infoWindow.open(_this.map,[e.lng,e.lat]);
+                    })
                 }else if(type==1){
                     let {lng,lat}=e.lnglat;
                     var marker = new AMap.Marker({
@@ -95,7 +106,7 @@
                    })
             },
             addUser(){
-
+                this.$message.error("在地图上鼠标单击右键选定位置，单击位置坐标添加用户信息")
             },
             getLocationList(){
                 this.$axios.get("/locationList").then(data=>{
@@ -152,6 +163,18 @@
 <style scoped>
 .map{
     height: 800px;width: 100%;
+}
+.sp11 {
+    width: 100%;
+display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    color: #848ca4;
+    font-size: 8px;
+}
+.sp12 {
+    color: #333333;
+    width: 100%;
 }
 
 </style>

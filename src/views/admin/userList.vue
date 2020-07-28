@@ -3,29 +3,21 @@
         <div class="toolbar">
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
-                    <el-select v-model="adType" placeholder="广告类别" @change="select">
-                        <el-option v-for="item in adTypeList" :value="item.adType" :label="item.adType" :key="item._id"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-input v-model="adName" placeholder="请输入广告名称"></el-input>
+                    <el-input v-model="userName" placeholder="请输入用户名"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="search()">查询</el-button>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="success" @click="addAd">添加广告</el-button>
                 </el-form-item>
             </el-form>
         </div>
         <el-table
                 v-loading = "$store.state.loading"
                 :border = "true"
-                :data="adList"
+                :data="userList"
                 style="width: 100%">
             <el-table-column
                     label="创建时间"
-                    >
+            >
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
                     <span style="margin-left: 10px">{{scope.row.createTime | date}}</span>
@@ -33,27 +25,27 @@
             </el-table-column>
             <el-table-column
                     label="广告名称"
-                   >
+            >
                 <template slot-scope="scope">
                     <i class="el-icon-user"></i>
-                    <span style="margin-left: 10px">{{scope.row.adName}}</span>
+                    <span style="margin-left: 10px">{{scope.row.userName}}</span>
                 </template>
             </el-table-column>
             <el-table-column
-                    label="广告类别"
-                   >
+                    label="电话"
+            >
                 <template slot-scope="scope">
-                    <span style="margin-left: 10px">{{scope.row.adType}}</span>
+                    <span style="margin-left: 10px">{{scope.row.phone}}</span>
                 </template>
             </el-table-column>
             <el-table-column
-                    label="广告图"
-                    >
+                    label="照片"
+            >
                 <template slot-scope="scope">
                     <el-image
                             style="width: 100px; height: 100px"
-                            :src="'http://47.98.238.74:8088/'+scope.row.adPic" alt="帅哥"
-                            :preview-src-list="['http://47.98.238.74:8088/'+scope.row.adPic]">
+                            :src="'http://47.98.238.74:8088/'+scope.row.headImg" alt="帅哥"
+                            :preview-src-list="['http://47.98.238.74:8088/'+scope.row.headImg]">
                     </el-image>
                 </template>
             </el-table-column>
@@ -76,20 +68,19 @@
                 layout="prev, pager, next"
         >
         </el-pagination>
-        <AddAd ref="AddAd"></AddAd>
     </div>
 </template>
 
 <script>
     export default {
-        name: "ad",
+        name: "userList",
         data(){
             return{
                 adType:'',
                 adTypeList:[],
                 pageSum:0,
-                adList:[],
-                adName:''
+                userList:[],
+                userName:''
             }
         },
         methods:{
@@ -97,54 +88,32 @@
                 this.getList(1,"",this.adType)
             },
             changeCurrent(v){
-                    this.getList(v)
+                this.getList(v)
             },
-            getList(pageIndex=1,keyWord="",type=""){
-                this.$axios.get("/advertisement",{
+            getList(pageIndex=1,keyWord=""){
+                this.$axios.get("/allLocationList",{
                     params:{
                         pageIndex,
-                        keyWord,type
+                        keyWord
                     }
                 }).then(data=>{
                     if(data.ok==1){
-                        this.adList=data.data.adList;
+                        this.userList=data.data.locationList;
                         this.pageSum=data.data.pageSum;
                     }else{
-                        this.adTypeList=[]
+                        this.userList=[];
+                        this.$message.error(data.msg)
                     }
 
                 }).catch(()=>{
-                    this.adTypeList=[]
+                    this.userList=[]
                 })
             },
-            update(row){
-                this.$refs.AddAd.dialogFormVisible=true;
-                this.$refs.AddAd.init();
-                this.$refs.AddAd.title=1;
-                this.$refs.AddAd.form.adName=row.adName;
-                this.$refs.AddAd.form.adTypeId=row.adTypeId;
-                this.$refs.AddAd.form.shopTypeId=row.shopTypeId;
-                this.$refs.AddAd.form.shopId=row.shopId;
-                this.$refs.AddAd.shopTypeChange();
-            },
-            addAd(){
-                this.$refs.AddAd.dialogFormVisible=true;
-                this.$refs.AddAd.init();
+            update(){
+
             },
             search(){
-                this.getList(1,this.adName)
-            },
-            getAdType(){
-                this.$axios.get("/adTypeList").then(data=>{
-                    if(data.ok==1){
-                        this.adTypeList=data.adTypeList;
-                    }else{
-                        this.adTypeList=[]
-                    }
-
-                }).catch(()=>{
-                    this.adTypeList=[]
-                })
+                this.getList(1,this.userName)
             },
             open(id){
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
@@ -152,7 +121,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.delete("/advertisement",{
+                    this.$axios.delete("/userLocation",{
                         params:{
                             id
                         }
@@ -163,7 +132,7 @@
                         }else{
                             this.$message.error(data.msg)
                         }
-                        this.$store.dispatch("adminHandle",{type:"删除广告",adminName:localStorage.adminName,msg:data.msg});
+                        this.$store.dispatch("adminHandle",{type:"删除用户信息",adminName:localStorage.adminName,msg:data.msg});
                     })
                 }).catch(() => {
                     this.$message({
@@ -175,7 +144,6 @@
         },
         mounted() {
             this.getList();
-            this.getAdType();
         }
     }
 </script>

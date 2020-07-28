@@ -11,7 +11,7 @@
                 :data="form"
                 name="shopTypePic"
                 :headers="{authorization:$store.state.admin.token}"
-                action="/ele/shopType"
+                action="http://47.98.238.74:8088/shopType"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"

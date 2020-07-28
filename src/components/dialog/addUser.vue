@@ -13,7 +13,7 @@
                     :data="form"
                     name="headImg"
                     :headers="{authorization:$store.state.admin.token}"
-                    :action="title?'/ele/updateLocation':'/ele/Location'"
+                    :action="title?'http://47.98.238.74:8088/updateLocation':'http://47.98.238.74:8088/Location'"
                     :limit="1"
                     :on-success="success"
                     :multiple="false"
@@ -61,6 +61,7 @@
             success(data){
                 this.dialogFormVisible=false;
                 this.$parent.getLocationList();
+                //this.$parent.map.setCenter(this.form.lng,this.form.lat);
                 this.$store.dispatch("adminHandle",{type:"添加用户位置",adminName:localStorage.adminName,msg:data.msg});
                 this.$message.success(data.msg)
             }

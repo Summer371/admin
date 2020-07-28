@@ -89,8 +89,8 @@
                     <template slot-scope="scope">
                         <el-image
                                 style="width: 100px; height: 100px"
-                                :src="'/ele/'+scope.row.goodsPic" alt="帅哥"
-                                :preview-src-list="['/ele/'+scope.row.goodsPic]">
+                                :src="'http://47.98.238.74:8088/'+scope.row.goodsPic" alt="帅哥"
+                                :preview-src-list="['http://47.98.238.74:8088/'+scope.row.goodsPic]">
                         </el-image>
                     </template>
                 </el-table-column>
