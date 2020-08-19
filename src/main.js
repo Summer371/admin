@@ -20,12 +20,12 @@ axios.interceptors.request.use(config=>{
     if(localStorage.token){
         config.headers={
             authorization:localStorage.token,
-            permissions:localStorage.permissions || store.admin.permissions
+            permissions:localStorage.permissions || store.admin.permission
         }
     }
     store.commit("CHANGE_LOADING",true);
-    config.url = "http://47.98.238.74:8088"+config.url;///47.98.238.74
-    return config;
+     config.url = "/ele/"+config.url;///47.98.238.74
+     return config;
 })
 //响应拦截
 axios.interceptors.response.use(({data})=>{

@@ -4,11 +4,16 @@ const bodyParser=require("body-parser");
 const db = require("./module/db");
 const tools = require("./module/tools");
 const fs=require("fs");
+const path = require("path");
 const mongodb = require("mongodb");
 const formidable = require("formidable");
 const {upPic} = require("./module/upPic");
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
+
+let adminList=[];
+let admin='';
+
 //*********************后台*****************************
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
@@ -47,12 +52,24 @@ app.post("/adminLogin",function (req,res) {
             const token=tools.enToken({
                     adminName
                 });
-            res.json({
-                ok:1,
-                adminName,
-                token,
-                permissions:adminInfo.permissions
-            })
+            admin=adminName;
+            let isLogin =adminList.includes(admin);
+            if(isLogin){
+                res.json({
+                    ok:-2,
+                    adminName,
+                    msg:"用户已在其它设备登录"
+                })
+            }else{
+                adminList.push(admin)
+                res.json({
+                    ok:1,
+                    adminName,
+                    token,
+                    permissions:adminInfo.permissions
+                })
+            }
+
         }else{
             tools.json(res,-1,"管理员账号或密码错误")
         }
@@ -322,10 +339,14 @@ app.all("*",function (req,res,next) {
     if (req.method.toLowerCase() == 'options')
         res.send(200);  //让options尝试请求快速结束
     else {
-        const {ok,msg}=tools.deToken(req.headers.authorization);
+        const {ok,msg,adminName}=tools.deToken(req.headers.authorization);
         if(ok==1){
             next();
         }else{
+            let index=adminList.findIndex(v=>{
+                return v=adminName
+            })
+            delete  adminList[index]
             res.json({
                 ok,msg
             })
@@ -899,6 +920,49 @@ app.get("/locationSearch",async (req,res)=>{
     })
 
 });
+
+
+
+/******保存文件*************/
+
+app.post("/saveFile",(req,res)=>{
+    const uploadDir = path.resolve(__dirname,"./upload");
+    const form = new formidable.IncomingForm();
+    form.uploadDir = uploadDir;// 设置上传的文件目录。
+    form.keepExtensions = true;// 是否保留上传文件的扩展名。
+        form.parse(req, function (err, params, file){
+            const fileInfo = file["file"];
+           // const fileExtName = path.extname(fileInfo.path).toLowerCase();
+            if(fileInfo.size<=0){
+                res.json({
+                    ok:-1,
+                    msg:"未上传文件"
+                })
+                return
+            }
+            const newName =fileInfo.name;
+            fs.rename(fileInfo.path,uploadDir +"/file/" + newName, function (err) {
+                db.insertOne("fileList",{
+                    fileName:newName,
+                    filePath:uploadDir +"/file/",
+                    createTime:Date.now(),
+                    creator:""
+                })
+               res.json({
+                   ok:1,
+                   msg:"上传成功"
+               })
+            })
+        })
+})
+
+
+
+
+
+
+
+
 
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");

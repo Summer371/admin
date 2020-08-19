@@ -47,8 +47,11 @@
                   <template slot="title"><i class="el-icon-data-line"></i>广告设置</template>
                   <el-menu-item index="/adType">广告类别</el-menu-item>
                   <el-menu-item index="/ad">广告管理</el-menu-item>
-
               </el-submenu>
+            <el-submenu index="5">
+              <template slot="title"><i class="el-icon-data-line"></i>文件管理</template>
+              <el-menu-item index="/saveFile">保存文件</el-menu-item>
+            </el-submenu>
           </el-menu>
         </el-aside>
         <el-main><router-view/></el-main>

@@ -29,7 +29,8 @@ module.exports.deToken =function (token) {
         if(info.lastTime > Date.now()){
             return {
                 ok:1,
-                msg:"正常"
+                msg:"正常",
+                adminName:info.adminName
             }
         }else{
             return {

@@ -1,7 +1,7 @@
 module.exports={
     devServer:{
         open:true,
-        port:8080,
+        port:8081,
         host:"localhost",
         proxy:{
             "^/ele":{
