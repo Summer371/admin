@@ -52,23 +52,13 @@ app.post("/adminLogin",function (req,res) {
             const token=tools.enToken({
                     adminName
                 });
-            admin=adminName;
-            let isLogin =adminList.includes(admin);
-            if(isLogin){
-                res.json({
-                    ok:-2,
-                    adminName,
-                    msg:"用户已在其它设备登录"
-                })
-            }else{
-                adminList.push(admin)
-                res.json({
+
+            res.json({
                     ok:1,
                     adminName,
                     token,
                     permissions:adminInfo.permissions
                 })
-            }
 
         }else{
             tools.json(res,-1,"管理员账号或密码错误")
@@ -339,14 +329,10 @@ app.all("*",function (req,res,next) {
     if (req.method.toLowerCase() == 'options')
         res.send(200);  //让options尝试请求快速结束
     else {
-        const {ok,msg,adminName}=tools.deToken(req.headers.authorization);
+        const {ok,msg}=tools.deToken(req.headers.authorization);
         if(ok==1){
             next();
         }else{
-            let index=adminList.findIndex(v=>{
-                return v=adminName
-            })
-            delete  adminList[index]
             res.json({
                 ok,msg
             })
