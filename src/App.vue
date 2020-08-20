@@ -66,7 +66,12 @@
                 isCollapse: false,
                 admin:localStorage.adminName || ""
             }
-        }
+        },
+      mounted() {
+        // window.onbeforeunload = function (e) {
+        //   window.localStorage.clear();
+        // }
+      }
     }
 </script>
 <style lang="less">

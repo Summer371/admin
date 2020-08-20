@@ -9,8 +9,18 @@ import  axios from "axios"
 import filter from "@/filters"
 import components from "@/components"
 
+import VueSocketIO from 'vue-socket.io'
+Vue.use(new VueSocketIO({
+    debug: true,
+    connection: 'http://localhost:3000',
+    // vuex: {
+    //     store,
+    //     actionPrefix: 'SOCKET_',
+    //     mutationPrefix: 'SOCKET_'
+    // },
+    // options: { path: "/my-app/" } //Optional options
+}))
 Vue.prototype.$axios=axios;
-
 Vue.use(ElementUI);
 Vue.use(filter);
 Vue.use(components);

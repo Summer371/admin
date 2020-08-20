@@ -3,16 +3,41 @@ const app=express();
 const bodyParser=require("body-parser");
 const db = require("./module/db");
 const tools = require("./module/tools");
+const http = require("http");// 内置 模块
+const ws = require("nodejs-websocket");
+const httpServer = http.createServer(app);
+const webSocketIo = require("socket.io");
+const io = webSocketIo(httpServer);// 让你的服务允许接收socket消息。
 const fs=require("fs");
 const path = require("path");
 const mongodb = require("mongodb");
 const formidable = require("formidable");
 const {upPic} = require("./module/upPic");
+const userList = {};// {1:"zhangsan"} 对象的属性名就是你的socket.id,值是你的userName
+io.on('connection', client => {
+    client.on("login",data=>{
+        let {userName}=data;
+        userList[client.id]=userName;
+        client.emit("online",{str:userName+":登录成功",num:Object.keys(userList).length})
+    });
+    client.on("text",data=>{
+        client.emit("send",userList[client.id]+"说了:"+data)
+    });
+    client.on('event', data => {
+        console.log(data)
+    });
+    client.on('disconnect', () => {
+        io.emit("online",{str:userList[client.id]+"退出了房间",num:Object.keys(userList).length-1});
+        delete userList[client.id];
+        console.log("断开连接...")
+    });
+});
+
+httpServer.listen(3000);
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
 
-let adminList=[];
-let admin='';
+
 
 //*********************后台*****************************
 app.all("*",function (req,res,next) {
