@@ -24,7 +24,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                    label="广告名称"
+                    label="用户名称"
             >
                 <template slot-scope="scope">
                     <i class="el-icon-user"></i>

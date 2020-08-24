@@ -9,17 +9,17 @@ import  axios from "axios"
 import filter from "@/filters"
 import components from "@/components"
 
-import VueSocketIO from 'vue-socket.io'
-Vue.use(new VueSocketIO({
-    debug: true,
-    connection: 'http://localhost:3000',
-    // vuex: {
-    //     store,
-    //     actionPrefix: 'SOCKET_',
-    //     mutationPrefix: 'SOCKET_'
-    // },
-    // options: { path: "/my-app/" } //Optional options
-}))
+//import VueSocketIO from 'vue-socket.io'
+// Vue.use(new VueSocketIO({
+//     debug: true,
+//     connection: 'http://47.98.238.74:3000',
+//     // vuex: {
+//     //     store,
+//     //     actionPrefix: 'SOCKET_',
+//     //     mutationPrefix: 'SOCKET_'
+//     // },
+//     // options: { path: "/my-app/" } //Optional options
+// }))
 Vue.prototype.$axios=axios;
 Vue.use(ElementUI);
 Vue.use(filter);
@@ -34,7 +34,7 @@ axios.interceptors.request.use(config=>{
         }
     }
     store.commit("CHANGE_LOADING",true);
-     config.url = "/ele/"+config.url;///47.98.238.74
+     config.url = "/ele"+config.url;///http://47.98.238.74:8088
      return config;
 })
 //响应拦截

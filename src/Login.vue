@@ -8,7 +8,7 @@
             <el-input v-model="adminInfo.passWord" type="password" placeholder="管理员密码" show-password></el-input>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="submitForm" class="loginBn" :loading="$store.state.loading">立即登录</el-button>
+            <el-button type="primary" @click="submitForm" class="loginBn" :loading="$store.state.loading"  @keyup.enter.native="submitForm">立即登录</el-button>
             <el-button @click="resetForm" class="resetBn">重置</el-button>
         </el-form-item>
 
@@ -78,7 +78,17 @@
                 this.$refs.adminForm.resetFields();
                 this.$store.state.loading=false;
             }
-        }
+        },
+        created () {
+            // 回车事件
+            var that = this;
+            document.onkeydown = function (e) {
+                var ev = (typeof event != 'undefined') ? window.event : e;
+                if (ev.keyCode == 13) {
+                    that.submitForm();
+                }
+            }
+        },
     }
 </script>
 

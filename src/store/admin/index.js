@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Message } from 'element-ui';
 const state = {
     adminName:localStorage.adminName,
     token:localStorage.token,
@@ -15,6 +16,7 @@ const mutations={
     OUT_LOGIN(state){
         localStorage.clear();
         state.adminName=state.token=null;
+        Message.error("登录超时，已退出登录")
     },
     GET_LOG(stage,adminLog){
         state.adminLog = adminLog;

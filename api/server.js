@@ -13,6 +13,17 @@ const path = require("path");
 const mongodb = require("mongodb");
 const formidable = require("formidable");
 const {upPic} = require("./module/upPic");
+const interfaces = require('os').networkInterfaces(); // 在开发环境中获取局域网中的本机iP地址
+let IPAdress = '';//本机ip
+for(var devName in interfaces){
+    var iface = interfaces[devName];
+    for(var i=0;i<iface.length;i++){
+        var alias = iface[i];
+        if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
+            IPAdress = alias.address;
+        }
+    }
+}
 const userList = {};// {1:"zhangsan"} 对象的属性名就是你的socket.id,值是你的userName
 io.on('connection', client => {
     client.on("login",data=>{
@@ -937,6 +948,7 @@ app.get("/locationSearch",async (req,res)=>{
 /******保存文件*************/
 
 app.post("/saveFile",(req,res)=>{
+    const {adminName}=tools.deToken(req.headers.authorization);
     const uploadDir = path.resolve(__dirname,"./upload");
     const form = new formidable.IncomingForm();
     form.uploadDir = uploadDir;// 设置上传的文件目录。
@@ -955,9 +967,10 @@ app.post("/saveFile",(req,res)=>{
             fs.rename(fileInfo.path,uploadDir +"/file/" + newName, function (err) {
                 db.insertOne("fileList",{
                     fileName:newName,
-                    filePath:uploadDir +"/file/",
+                    filePath:"http://"+IPAdress +"/file/",
+                    fileType:newName.split(".")[1],
                     createTime:Date.now(),
-                    creator:""
+                    creator:adminName
                 })
                res.json({
                    ok:1,
@@ -965,15 +978,47 @@ app.post("/saveFile",(req,res)=>{
                })
             })
         })
-})
+});
 
+app.get("/filesList",async (req,res)=>{
+    const {pageIndex}=req.query;
+    const filesList=await db.getPageInfo("fileList",{
+        sort:{
+            createTime:-1
+        },
+        pageIndex
+    });
 
+    res.json({
+        ok:1,
+        filesList
+    })
+});
 
+app.post("/downloadFile",async (req,res)=>{
+    const {id}=req.body;
+    const info=await db.findOneById('fileList',id);
+    let currDir = path.join(__dirname,"/upload/file/"),
+        fileName =info.fileName,
+        currFile = path.join(currDir,fileName),
+        stats = fs.statSync(currFile);
+    fs.exists(currFile,function(exist) {
+        if(exist){
+            res.set({
+                "Content-type":"application/octet-stream",
+                "Content-Disposition":"attachment;filename="+encodeURI(fileName),
+                'Content-Length': stats.size
+            });
+            let fReadStream = fs.createReadStream(currFile);
+            fReadStream.pipe(res);
+        }else{
+            res.set("Content-type","text/html");
+            res.send("file not exist!");
+            res.end();
+        }
+    });
 
-
-
-
-
+});
 
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
@@ -1137,6 +1182,36 @@ app.delete("/advertisement",async function (req,res) {
 
 });
 
+
+app.delete("/file",async (req,res)=>{
+    const {id}=req.query;
+    const info =await db.findOneById("fileList",id);
+
+    try{
+        fs.unlink(__dirname+"/upload/file/"+info.fileName,async function (err) {
+            if(err){
+                res.json({
+                    ok:-1,
+                    msg:"删除失败",err
+                })
+            }else{
+                await db.deleteOneById("fileList",info._id).then((data)=>{
+                    res.json({
+                        ok:1,
+                        msg:"删除成功"
+                    });
+                }).catch((e)=>res.json({ok:-2,msg:"删除失败",err:e}));
+            }
+        })
+    }catch(e){
+        res.json({
+            ok:-3,
+            msg:"删除失败",
+            err:e
+        })
+    }
+
+});
 app.all("*",function (req,res,next) {
     res.header("Access-Control-Allow-Origin","*");
     //允许的header类型
