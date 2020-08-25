@@ -52,7 +52,8 @@ router.beforeEach((to,from,next)=>{
         if(localStorage.token){
             next();
         }else{
-            store.commit("OUT_LOGIN")
+            store.commit("OUT_LOGIN");
+            ElementUI.Message.error("登录超时，已退出登录")
         }
     }else{
         next();

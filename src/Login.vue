@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import ip from "./untils/ip"
     export default {
         name: "Login",
         data(){
@@ -23,8 +24,8 @@
                 adminInfo: {
                     adminName: '',
                     passWord: '',
-                    ip:returnCitySN["cip"] || "",
-                    location:returnCitySN["cname"] || ''
+                    ip:returnCitySN["cip"]?returnCitySN["cip"]:'',
+                    location:returnCitySN["cname"]?returnCitySN["cname"]:''
                 },
                 rules: {
                     adminName: [
@@ -50,7 +51,7 @@
                                 message: '恭喜您，登陆成功！',
                                 type: 'success'
                             });
-
+                            this.$router.push("adminLog")
                         } catch ({msg}) {
                             this.$message.error(msg);
                         }
@@ -67,9 +68,11 @@
                                 message: data.msg,
                                 type: data.ok==1 ? "success":"warning"
                             });
+                            if(data.ok==1){
+                                this.$router.push("/adminList")
+                            }
                             this.adminInfo.adminName="";
                             this.adminInfo.passWord="";
-                            this.$router.push("/adminList")
                         })
                     }
                 })
@@ -89,6 +92,9 @@
                 }
             }
         },
+        mounted() {
+           // this.$store.dispatch("getLocation")
+        }
     }
 </script>
 
