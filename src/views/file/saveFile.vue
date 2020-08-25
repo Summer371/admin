@@ -176,6 +176,8 @@
             download(v){
                this.$axios.post('/downloadFile',{
                    id:v._id
+               },{
+                   responseType: 'blob'
                }).then(data=>{
                    const blob = new Blob([data], {
                        type: "application/octet-stream",

@@ -30,7 +30,7 @@ axios.interceptors.request.use(config=>{
     if(localStorage.token){
         config.headers={
             authorization:localStorage.token,
-            permissions:localStorage.permissions || store.admin.permission
+            permissions:localStorage.permissions || store.admin.permission || ""
         }
     }
     store.commit("CHANGE_LOADING",true);
