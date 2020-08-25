@@ -30,7 +30,7 @@
                 :data="form"
                 name="adPic"
                 :headers="{authorization:$store.state.admin.token}"
-                :action="title?'/updateAdvertisement':'/advertisement'"
+                :action="title?'http://47.98.238.74:8088/updateAdvertisement':'http://47.98.238.74:8088/advertisement'"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"
