@@ -1,22 +1,25 @@
 <template>
-    <el-form :model="adminInfo" :rules="rules" ref="adminForm" class="container">
-        <h3>小优商城管理员登录系<span @click="sig">统</span></h3>
-        <el-form-item  prop="adminName">
-            <el-input v-model="adminInfo.adminName" placeholder="管理员账号"></el-input>
-        </el-form-item>
-        <el-form-item  prop="passWord">
-            <el-input v-model="adminInfo.passWord" type="password" placeholder="管理员密码" show-password></el-input>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="submitForm" class="loginBn" :loading="$store.state.loading"  @keyup.enter.native="submitForm">立即登录</el-button>
-            <el-button @click="resetForm" class="resetBn">重置</el-button>
-        </el-form-item>
-
-    </el-form>
+    <div>
+        <el-form :model="adminInfo" :rules="rules" ref="adminForm" class="container">
+            <h3>小优商城管理员登录系<span @click="sig">统</span></h3>
+            <el-form-item  prop="adminName">
+                <el-input v-model="adminInfo.adminName" placeholder="管理员账号"></el-input>
+            </el-form-item>
+            <el-form-item  prop="passWord">
+                <el-input v-model="adminInfo.passWord" type="password" placeholder="管理员密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm" class="loginBn" :loading="$store.state.loading"  @keyup.enter.native="submitForm">立即登录</el-button>
+                <el-button @click="resetForm" class="resetBn">重置</el-button>
+            </el-form-item>
+            <el-form-item  prop="passWord">
+                <div id='text' style="text-align:center">豫ICP备19039785号<br><a href="http://www.beian.miit.gov.cn">工信部网站</a></div>
+            </el-form-item>
+        </el-form>
+    </div>
 </template>
 
 <script>
-import ip from "./untils/ip"
     export default {
         name: "Login",
         data(){

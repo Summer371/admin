@@ -45,6 +45,9 @@ io.on('connection', client => {
 });
 
 httpServer.listen(3000);*/
+
+
+
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
 
@@ -176,7 +179,7 @@ app.post("/userSingn1",function (req,res) {
         res.json({
             ok:-1,
             msg:"手机号或密码不能为空"
-        })
+        });
         return
     }
     db.findOne("phoneCode",{phoneId,code}).then(data=>{
@@ -221,30 +224,41 @@ app.post("/userLogin",async (req,res)=>{
         })
     }
 });
-app.get("/userSingn2",async (req,res)=>{
+app.post("/userSingn2",async (req,res)=>{
     const {phoneId,passWord}=req.query;
-    const info =await db.insertOne("userList",{
-        phoneId,
-        passWord:tools.md5(passWord),
-        createTime:Date.now()
+    const  result=await db.find("userList",{
+        whereObj:{
+            phoneId
+        }
     });
-    if(info){
-        res.json({
-            ok:1,
-            msg:"注册成功"
-        })
-    }else{
+    if(result){
         res.json({
             ok:-1,
-            msg:"注册失败"
+            msg:"注册失败，"+phoneId+"已注册"
         })
+    }else{
+        const info =await db.insertOne("userList",{
+            phoneId,
+            passWord:tools.md5(passWord),
+            createTime:Date.now()
+        });
+        if(info){
+            res.json({
+                ok:1,
+                msg:"注册成功",
+                phoneId
+            })
+        }else{
+            res.json({
+                ok:-1,
+                msg:"注册失败"
+            })
+        }
     }
+
 });
 
-
-
 //*************************app接口*****************
-
 
 app.get("/searchShopList",async function (req,res) {
     const whereObj={};
@@ -460,6 +474,7 @@ app.post("/shopType",async function (req,res) {
         }else{
             db.insertOne("shopTypeList",{
                 shopTypePic:newPicName,
+                picPath:"http://47.98.238.74:8088/"+newPicName,
                 shopType:params.shopType,
                 createTime:Date.now()
             }).then(()=>{
@@ -517,6 +532,7 @@ app.post("/shop",async function (req,res) {
         const shopTypeInfo = await db.findOneById("shopTypeList",params.shopTypeId);
         db.insertOne("shopList",{
             shopPic:newPicName,
+            picPath:"http://47.98.238.74:8088/"+newPicName,
             shopType:shopTypeInfo.shopType,
             shopTypeId:shopTypeInfo._id,
             shopName:params.shopName,
@@ -536,12 +552,13 @@ app.post("/updateShop",async function (req,res) {
     const shopTypeInfo = await db.findOneById("shopTypeList",params.shopTypeId);
     db.updateOneById("shopList",params.updateId,{
         $set:{
-        shopPic:newPicName,
-        shopType:shopTypeInfo.shopType,
-        shopTypeId:shopTypeInfo._id,
-        shopName:params.shopName,
-        isRecommend:params.isRecommend,
-        createTime:Date.now()}
+            shopPic:newPicName,
+            picPath:"http://47.98.238.74:8088/"+newPicName,
+            shopType:shopTypeInfo.shopType,
+            shopTypeId:shopTypeInfo._id,
+            shopName:params.shopName,
+            isRecommend:params.isRecommend,
+            createTime:Date.now()}
     }).then(()=>{
         res.json({
             ok:1,
@@ -677,6 +694,7 @@ app.post("/goods",async function (req,res) {
         const goodsTypeInfo = await db.findOneById("goodsTypeList",params.goodsTypeId);
         db.insertOne("goodsList",{
             goodsPic:newPicName,
+            picPath:"http://47.98.238.74:8088/"+newPicName,
             goodsName:params.goodsName,
             goodsType:goodsTypeInfo.goodsType,
             goodsTypeId:goodsTypeInfo._id,
@@ -716,6 +734,7 @@ app.post("/updateGoods",async function(req,res){
         db.updateOneById("goodsList",params.updateId,{
             $set: {
                 goodsPic: newPicName,
+                picPath:"http://47.98.238.74:8088/"+newPicName,
                 goodsName: params.goodsName,
                 goodsType: goodsInfo.shopType,
                 goodsTypeId: goodsInfo.goodsTypeId,
@@ -744,7 +763,7 @@ app.get("/goodsList",async function (req,res) {
         whereObj.goodsName=new RegExp(keyWord);
     }
     if(type.length>0){
-        whereObj.goodsTypeId=type;
+        whereObj.goodsType=type;
     }
     const goodsList=await db.getPageInfo("goodsList",{
         pageIndex:(req.query.pageIndex || 1)/1,
@@ -842,9 +861,10 @@ app.post("/advertisement",async (req,res)=>{
         const adTypeInfo=await db.findOneById("adTypeList",adTypeId);
         db.insertOne("adList",{
             adPic:newPicName,
+            picPath:"http://47.98.238.74:8088/"+newPicName,
             shopTypeId:shopInfo.shopTypeId,
             shopName:shopInfo.shopName,
-            shopId:shopInfo.shopId,
+            shopId:shopInfo._id,
             shopType:shopInfo.shopType,
             adType:adTypeInfo.adType,
             adTypeId,
@@ -960,14 +980,14 @@ app.post("/saveFile",(req,res)=>{
                 res.json({
                     ok:-1,
                     msg:"未上传文件"
-                })
+                });
                 return
             }
             const newName =fileInfo.name;
             fs.rename(fileInfo.path,uploadDir +"/file/" + newName, function (err) {
                 db.insertOne("fileList",{
                     fileName:newName,
-                    filePath:"http://"+IPAdress +"/file/",
+                    filePath:"http://47.98.238.74:8088" +"/file/"+newName,
                     fileType:newName.split(".")[1],
                     createTime:Date.now(),
                     creator:adminName
@@ -1143,7 +1163,7 @@ app.delete("/goods",async function (req,res) {
 });
 app.delete("/adType",function (req,res) {
     const id=req.query.id;
-    db.deleteOneById("adTypeList",id).then((data)=>{
+    db.deleteOneById("adTypeList",id).then(()=>{
         res.json({
             ok:1,
             msg:"删除成功"
@@ -1187,7 +1207,6 @@ app.delete("/advertisement",async function (req,res) {
 app.delete("/file",async (req,res)=>{
     const {id}=req.query;
     const info =await db.findOneById("fileList",id);
-
     try{
         fs.unlink(__dirname+"/upload/file/"+info.fileName,async function (err) {
             if(err){

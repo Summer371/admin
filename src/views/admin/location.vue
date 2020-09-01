@@ -54,7 +54,7 @@
                 if(type==0){
                     let icon = new AMap.Icon({
                         size: new AMap.Size(38, 40),    // 图标尺寸
-                        image: 'http://47.98.238.74:8088/'+e.headImg,  // Icon的图像地址
+                        image: e.picPath,  // Icon的图像地址
                         imageSize: new AMap.Size(38, 40)   // 根据所设置的大小拉伸或压缩图片
                     });
                     var marker = new AMap.Marker({

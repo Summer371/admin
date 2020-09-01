@@ -39,7 +39,7 @@
                 :data="form"
                 name="goodsPic"
                 :headers="{authorization:$store.state.admin.token}"
-                :action="title?'http://47.98.238.74:8088/updateGoods':'http://47.98.238.74:8088/goods'"
+                :action="title?'/ele/updateGoods':'/ele/goods'"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"

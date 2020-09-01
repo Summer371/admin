@@ -1,3 +1,5 @@
+import {Message} from "element-ui"
+
 export default [
     {
         path:"/adminLog",
@@ -17,7 +19,7 @@ export default [
         },
         beforeEnter: (to, from, next) => {
             if(localStorage.permissions!=="02"){
-                alert("您暂时无权访问")
+                Message.error("您暂时无权访问")
                 return
             }
             next();

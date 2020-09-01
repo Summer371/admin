@@ -1,6 +1,7 @@
 {
-  "name": "ele",
-  "version": "0.1.0",
+  "name": "admin_xiaoyou",
+  "version": "1.1.1",
+  "author": "caoshaogang",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

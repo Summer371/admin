@@ -2,7 +2,7 @@
     <div>
         <el-upload
                 class="upload-demo"
-                action="http://47.98.238.74:8088/saveFile"
+                action="/ele/saveFile"
                 ref="upload"
                 name="file"
                 :headers="{authorization:$store.state.admin.token,permissions:$store.state.admin.permissions}"

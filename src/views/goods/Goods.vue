@@ -4,7 +4,7 @@
             <el-form :inline="true"  class="demo-form-inline">
                 <el-form-item>
                     <el-select v-model="goodsType" placeholder="商品类别" @change="select">
-                        <el-option v-for="item in $store.state.goods.allGoodsTypeList" :value="item._id" :label="item.goodsType" :key="item._id"></el-option>
+                        <el-option v-for="item in $store.state.goods.allGoodsTypeList" :value="item.goodsType" :label="item.goodsType" :key="item._id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -89,8 +89,8 @@
                     <template slot-scope="scope">
                         <el-image
                                 style="width: 100px; height: 100px"
-                                :src="'http://47.98.238.74:8088/'+scope.row.goodsPic" alt="帅哥"
-                                :preview-src-list="['http://47.98.238.74:8088/'+scope.row.goodsPic]">
+                                :src="scope.row.picPath" alt="帅哥"
+                                :preview-src-list="[scope.row.picPath]">
                         </el-image>
                     </template>
                 </el-table-column>

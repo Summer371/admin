@@ -20,7 +20,7 @@
                 :data="form"
                 name="shopPic"
                 :headers="{authorization:$store.state.admin.token}"
-                :action="title?'http://47.98.238.74:8088/updateShop':'http://47.98.238.74:8088/shop'"
+                :action="title?'/ele/updateShop':'/ele/shop'"
                 :limit="1"
                 :on-success="success"
                 :multiple="false"

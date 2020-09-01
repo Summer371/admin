@@ -17,11 +17,11 @@ const mutations={
     OUT_LOGIN(state){
         localStorage.clear();
         state.adminName=state.token=null;
-        Message({
+        /*Message({
             type:"success",
             message:"退出成功",
             center:false
-        })
+        })*/
     },
     GET_LOG(stage,adminLog){
         state.adminLog = adminLog;
@@ -36,7 +36,6 @@ const actions={
             const data= await axios.post("/adminLogin",adminInfo);
             if(data.ok===1){
                 content.commit("CHANGE_ADMIN_TOKEN",data);
-
                 resolve(data)
             }else{
                 reject(data)

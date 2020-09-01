@@ -13,7 +13,7 @@
                     :data="form"
                     name="headImg"
                     :headers="{authorization:$store.state.admin.token}"
-                    :action="title?'http://47.98.238.74:8088/updateLocation':'http://47.98.238.74:8088/Location'"
+                    :action="title?'/ele/updateLocation':'/ele/Location'"
                     :limit="1"
                     :on-success="success"
                     :multiple="false"

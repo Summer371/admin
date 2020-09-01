@@ -9,6 +9,9 @@ import  axios from "axios"
 import filter from "@/filters"
 import components from "@/components"
 
+
+let url="http://47.98.238.74:8088";
+Vue.prototype.$url=url;
 //import VueSocketIO from 'vue-socket.io'
 // Vue.use(new VueSocketIO({
 //     debug: true,
@@ -34,7 +37,7 @@ axios.interceptors.request.use(config=>{
         }
     }
     store.commit("CHANGE_LOADING",true);
-     config.url = "http://47.98.238.74:8088"+config.url;///http://47.98.238.74:8088
+     config.url = "/ele"+config.url;///http://47.98.238.74:8088
      return config;
 })
 //响应拦截
@@ -53,7 +56,7 @@ router.beforeEach((to,from,next)=>{
             next();
         }else{
             store.commit("OUT_LOGIN");
-            ElementUI.Message.error("登录超时，已退出登录")
+           // ElementUI.Message.error("登录超时，已退出登录")
         }
     }else{
         next();
