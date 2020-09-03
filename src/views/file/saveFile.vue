@@ -58,6 +58,15 @@
                     </template>
                 </el-table-column>
                 <el-table-column
+                        label="预览"
+                >
+                    <template slot-scope="scope">
+                       <el-image :src="scope.row.filePath" style="width: 100px;height: 100px"  :preview-src-list="[scope.row.filePath]"
+                                 v-show="scope.row.fileType=='jpg' || scope.row.fileType=='jpeg' || scope.row.fileType=='png' || scope.row.fileType=='gif'"
+                       ></el-image>
+                    </template>
+                </el-table-column>
+                <el-table-column
                         label="文件格式"
                 >
                     <template slot-scope="scope">
@@ -201,10 +210,10 @@
                         }
                     }).then(data=>{
                         if(data.ok==1){
-                            this.$message.success("删除成功");
+                            this.$message.success(data.msg);
                             this.getList()
                         }else{
-                            this.$message.error("删除失败")
+                            this.$message.error(data.msg)
                         }
                         this.$store.dispatch("adminHandle",{type:"删除文件",adminName:localStorage.adminName,msg:data.msg});
                     })

@@ -916,6 +916,7 @@ app.post("/Location",async (req,res)=>{
     db.insertOne("locationList",{
         userName,
         phone,
+        picPath:"http://47.98.238.74:8088/"+newPicName,
         headImg:newPicName,
         lng,
         lat,
@@ -1212,7 +1213,7 @@ app.delete("/file",async (req,res)=>{
             if(err){
                 res.json({
                     ok:-1,
-                    msg:"删除失败",err
+                    msg:"删除失败"
                 })
             }else{
                 await db.deleteOneById("fileList",info._id).then((data)=>{
@@ -1220,14 +1221,13 @@ app.delete("/file",async (req,res)=>{
                         ok:1,
                         msg:"删除成功"
                     });
-                }).catch((e)=>res.json({ok:-2,msg:"删除失败",err:e}));
+                }).catch((e)=>res.json({ok:-2,msg:"删除失败"}));
             }
         })
     }catch(e){
         res.json({
             ok:-3,
-            msg:"删除失败",
-            err:e
+            msg:"删除失败"
         })
     }
 
