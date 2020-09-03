@@ -6,6 +6,8 @@ import shop from "./shop"
 import goods from "./goods"
 import ad from "./ad";
 import file from "./file";
+import wechat from "./wechat";
+import permission from "./permission"
 Vue.use(Router)
 const router=new Router({
     mode: 'history',
@@ -15,7 +17,9 @@ const router=new Router({
         ...shop,
         ...goods,
         ...ad,
-        ...file
+        ...file,
+        ...wechat,
+        ...permission
     ]
 })
 

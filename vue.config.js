@@ -1,16 +1,23 @@
 module.exports={
     devServer:{
-        open:true,
+        open:false,
         port:8081,
         host:"localhost",
         proxy:{
             "^/ele":{
-                target:"http://localhost:8088",
+                target:"http://47.98.238.74:8088",
                 changeOrigin:true,
                 pathRewrite:{
                     "^/ele":""
                 }
-            }
+            },
+            "^/wx":{
+                target:"http://47.98.238.74:8081",
+                changeOrigin:true,
+                pathRewrite:{
+                    "^/wx":""
+                }
+            },
         }
     },
     configureWebpack(config) {

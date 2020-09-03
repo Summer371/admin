@@ -62,8 +62,9 @@
                 >
                     <template slot-scope="scope">
                        <el-image :src="scope.row.filePath" style="width: 100px;height: 100px"  :preview-src-list="[scope.row.filePath]"
-                                 v-show="scope.row.fileType=='jpg' || scope.row.fileType=='jpeg' || scope.row.fileType=='png' || scope.row.fileType=='gif'"
+                                 v-if="scope.row.fileType=='jpg' || scope.row.fileType=='jpeg' || scope.row.fileType=='png' || scope.row.fileType=='gif'"
                        ></el-image>
+                        <span v-if="scope.row.fileType!=='jpg' && scope.row.fileType!=='jpeg' && scope.row.fileType!=='png' && scope.row.fileType!=='gif'">此类型文件无法预览</span>
                     </template>
                 </el-table-column>
                 <el-table-column

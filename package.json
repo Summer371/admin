@@ -14,6 +14,7 @@
     "core-js": "^2.6.5",
     "element-ui": "^2.12.0",
     "express": "^4.17.1",
+    "goeasy": "^1.0.21",
     "jwt-simple": "^0.5.6",
     "md5": "^2.2.1",
     "mongodb": "^3.3.2",

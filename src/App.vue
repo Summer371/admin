@@ -52,9 +52,21 @@
               <template slot="title"><i class="el-icon-data-line"></i>文件管理</template>
               <el-menu-item index="/saveFile">保存文件</el-menu-item>
             </el-submenu>
+            <el-submenu index="6">
+              <template slot="title"><i class="el-icon-data-line"></i>公众号管理</template>
+              <el-menu-item index="/media">素材</el-menu-item>
+            </el-submenu>
           </el-menu>
         </el-aside>
-        <el-main><router-view/></el-main>
+        <el-main>
+          <div class="wx">
+            <span>请添加微信公众号</span>
+            <el-image
+                    style="width: 120px;"
+                    src="http://47.98.238.74:8088/file/微信公众号.jpg"
+            ></el-image>
+          </div>
+          <router-view/></el-main>
       </el-container>
     </el-container>
   </div>
@@ -71,10 +83,29 @@
         // window.onbeforeunload = function (e) {
         //   window.localStorage.clear();
         // }
+        this.$goEasy.subscribe({
+          channel: "my_channel",//替换为您自己的channel
+          onMessage: function (message) {
+            console.log("Channel:" + message.channel + " content:" + message.content);
+          }
+        });
       }
     }
 </script>
 <style lang="less">
+  .wx{
+    position: fixed;
+    right:20px;
+    top: 60px;
+    z-index: 999;
+    display: flex;flex-direction: column;
+
+    >span{
+      font-weight: bolder;
+      font-size: 16px;
+      padding: 3px;
+    }
+  }
   *{
     padding:0;
     margin:0;
