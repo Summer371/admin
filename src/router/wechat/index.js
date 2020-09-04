@@ -7,4 +7,12 @@ export default [
             isAuthorization:true
         }
     },
+    {
+        path:"/goEasy",
+        name:"goEasy",
+        component:()=>import("@/views/wechat/goEasy"),
+        meta:{
+            isAuthorization:true
+        }
+    },
 ]

@@ -55,6 +55,7 @@
             <el-submenu index="6">
               <template slot="title"><i class="el-icon-data-line"></i>公众号管理</template>
               <el-menu-item index="/media">素材</el-menu-item>
+              <el-menu-item index="/goEasy">推送</el-menu-item>
             </el-submenu>
           </el-menu>
         </el-aside>
@@ -83,16 +84,14 @@
         // window.onbeforeunload = function (e) {
         //   window.localStorage.clear();
         // }
-        this.$goEasy.subscribe({
-          channel: "my_channel",//替换为您自己的channel
-          onMessage: function (message) {
-            console.log("Channel:" + message.channel + " content:" + message.content);
-          }
-        });
+
       }
     }
 </script>
 <style lang="less">
+  ul,li,ol{
+    list-style: none;
+  }
   .wx{
     position: fixed;
     right:20px;

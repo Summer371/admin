@@ -3,7 +3,7 @@ const app=express();
 const bodyParser=require("body-parser");
 const db = require("./module/db");
 const tools = require("./module/tools");
-//const http = require("http");// 内置 模块
+const http = require("http");// 内置 模块
 //const ws = require("nodejs-websocket");
 //const httpServer = http.createServer(app);
 //const webSocketIo = require("socket.io");
@@ -13,38 +13,8 @@ const path = require("path");
 const mongodb = require("mongodb");
 const formidable = require("formidable");
 const {upPic} = require("./module/upPic");
-const interfaces = require('os').networkInterfaces(); // 在开发环境中获取局域网中的本机iP地址
-let IPAdress = '';//本机ip
-for(var devName in interfaces){
-    var iface = interfaces[devName];
-    for(var i=0;i<iface.length;i++){
-        var alias = iface[i];
-        if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){
-            IPAdress = alias.address;
-        }
-    }
-}
-/*const userList = {};// {1:"zhangsan"} 对象的属性名就是你的socket.id,值是你的userName
-io.on('connection', client => {
-    client.on("login",data=>{
-        let {userName}=data;
-        userList[client.id]=userName;
-        client.emit("online",{str:userName+":登录成功",num:Object.keys(userList).length})
-    });
-    client.on("text",data=>{
-        client.emit("send",userList[client.id]+"说了:"+data)
-    });
-    client.on('event', data => {
-        console.log(data)
-    });
-    client.on('disconnect', () => {
-        io.emit("online",{str:userList[client.id]+"退出了房间",num:Object.keys(userList).length-1});
-        delete userList[client.id];
-        console.log("断开连接...")
-    });
-});
 
-httpServer.listen(3000);*/
+
 
 
 
@@ -67,6 +37,61 @@ app.all("*",function (req,res,next) {
     }
 });
 
+app.post("/getGoEasy",(req,res)=>{
+    let appkey = 'BC-a308502501574954856f8a779bbfec66';
+    let  options = {
+        hostname: 'rest-hangzhou.goeasy.io',
+        path: '/publish',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    };
+    let goEasy = http.request(options, (res) => {
+        res.setEncoding('utf8');
+        res.on('data', (result) => {
+            console.log(`响应结果: ${result}`);
+        });
+    });
+    var channel = 'sendMsg';
+    var {text,user} = req.body;
+    let content=user+":"+text;
+    var queryParams = 'appkey='+appkey+'&channel='+channel+'&content='+content;
+    goEasy.on('error', (e) => {
+        console.error(e);
+    });
+    goEasy.write(queryParams);
+    goEasy.end();
+    res.send(200);
+});
+
+app.post("/talkLogin",(req,res)=>{
+    let appkey = 'BC-a308502501574954856f8a779bbfec66';
+    let  options = {
+        hostname: 'rest-hangzhou.goeasy.io',
+        path: '/publish',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    };
+    let goEasy = http.request(options, (res) => {
+        res.setEncoding('utf8');
+        res.on('data', (result) => {
+            console.log(`响应结果: ${result}`);
+        });
+    });
+    var channel = 'talkLogin';
+    var {user} = req.body;
+    let content=user;
+    var queryParams = 'appkey='+appkey+'&channel='+channel+'&content='+content;
+    goEasy.on('error', (e) => {
+        console.error(e);
+    });
+    goEasy.write(queryParams);
+    goEasy.end();
+    res.send(200);
+});
 //登陆注册
 app.post("/adminLogin",function (req,res) {
     const {adminName,passWord,ip,location}= req.body;

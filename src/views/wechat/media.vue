@@ -139,10 +139,7 @@
             },
             open(){
                 this.$message.error("暂时不能删除")
-                this.$goEasy.publish({
-                    channel: "my_channel", //替换为您自己的channel
-                    message: "Hello, GoEasy!" //替换为您想要发送的消息内容
-                });
+
             },
             resetWx(){
                 this.$axios.get("/wx/config").then((data)=>{
