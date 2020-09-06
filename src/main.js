@@ -8,34 +8,34 @@ import 'element-ui/lib/theme-chalk/index.css';
 import  axios from "axios"
 import filter from "@/filters"
 import components from "@/components"
-import GoEasy from 'goeasy';
+//import GoEasy from 'goeasy';
 // 在main.js里初始化全局的GoEasy对象
-Vue.prototype.$goEasy = new GoEasy({
-    host: "hangzhou.goeasy.io",//应用所在的区域地址，杭州：hangzhou.goeasy.io，新加坡：singapore.goeasy.io
-    appkey: "BC-a308502501574954856f8a779bbfec66",//替换为您的应用appkey
-    onConnected: function() {
-        console.log('连接成功！')
-    },
-    onDisconnected: function() {
-        console.log('连接断开！')
-    },
-    onConnectFailed: function(error) {
-        console.log('连接失败或错误！')
-    }
-});
+// Vue.prototype.$goEasy = new GoEasy({
+//     host: "hangzhou.goeasy.io",//应用所在的区域地址，杭州：hangzhou.goeasy.io，新加坡：singapore.goeasy.io
+//     appkey: "BC-a308502501574954856f8a779bbfec66",//替换为您的应用appkey
+//     onConnected: function() {
+//         console.log('连接成功！')
+//     },
+//     onDisconnected: function() {
+//         console.log('连接断开！')
+//     },
+//     onConnectFailed: function(error) {
+//         console.log('连接失败或错误！')
+//     }
+// });
 let url="http://47.98.238.74:8088";
 Vue.prototype.$url=url;
-//import VueSocketIO from 'vue-socket.io'
-// Vue.use(new VueSocketIO({
-//     debug: true,
-//     connection: 'http://47.98.238.74:3000',
-//     // vuex: {
-//     //     store,
-//     //     actionPrefix: 'SOCKET_',
-//     //     mutationPrefix: 'SOCKET_'
-//     // },
-//     // options: { path: "/my-app/" } //Optional options
-// }))
+import VueSocketIO from 'vue-socket.io'
+Vue.use(new VueSocketIO({
+    debug: true,
+    connection: 'http://localhost:3000',
+    vuex: {
+        store,
+        actionPrefix: 'SOCKET_',
+        mutationPrefix: 'SOCKET_'
+    },
+    options: { path: "/socket.io/" } //Optional options
+}));
 Vue.prototype.$axios=axios;
 Vue.use(ElementUI);
 Vue.use(filter);

@@ -84,7 +84,6 @@
         // window.onbeforeunload = function (e) {
         //   window.localStorage.clear();
         // }
-
       }
     }
 </script>

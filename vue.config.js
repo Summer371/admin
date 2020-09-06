@@ -1,7 +1,7 @@
 module.exports={
     devServer:{
         open:true,
-        port:3000,
+        port:8080,
         host:"localhost",
         proxy:{
             "^/ele":{
@@ -17,6 +17,16 @@ module.exports={
                 pathRewrite:{
                     "^/wx":""
                 }
+            },
+            '/socket.io': {
+                target: 'http://127.0.0.1:3000', // target host
+                changeOrigin: true, // needed for virtual hosted sites
+                ws: true
+            },
+            'sockjs-node': {
+                target: 'http://127.0.0.1:3000',
+                ws: false,
+                changeOrigin: true
             },
         },
         disableHostCheck: true

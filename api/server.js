@@ -5,9 +5,9 @@ const db = require("./module/db");
 const tools = require("./module/tools");
 const http = require("http");// 内置 模块
 //const ws = require("nodejs-websocket");
-//const httpServer = http.createServer(app);
-//const webSocketIo = require("socket.io");
-//const io = webSocketIo(httpServer);// 让你的服务允许接收socket消息。
+const httpServer = http.createServer(app);
+const webSocketIo = require("socket.io");
+const io = webSocketIo(httpServer);// 让你的服务允许接收socket消息。
 const fs=require("fs");
 const path = require("path");
 const mongodb = require("mongodb");
@@ -15,12 +15,8 @@ const formidable = require("formidable");
 const {upPic} = require("./module/upPic");
 
 
-
-
-
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
-
 
 
 //*********************后台*****************************
@@ -37,61 +33,85 @@ app.all("*",function (req,res,next) {
     }
 });
 
-app.post("/getGoEasy",(req,res)=>{
-    let appkey = 'BC-a308502501574954856f8a779bbfec66';
-    let  options = {
-        hostname: 'rest-hangzhou.goeasy.io',
-        path: '/publish',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    };
-    let goEasy = http.request(options, (res) => {
-        res.setEncoding('utf8');
-        res.on('data', (result) => {
-            console.log(`响应结果: ${result}`);
-        });
+let userList={};
+io.on('connection',function(socket){
+    console.log("websocket开始建立连接...");
+    socket.emit('connecting',"server is connected");
+    socket.on("login",(data)=>{
+        userList[socket.id]=data.user;
+        socket.emit("join",data.user);
     });
-    var channel = 'sendMsg';
-    var {text,user} = req.body;
-    let content=user+":"+text;
-    var queryParams = 'appkey='+appkey+'&channel='+channel+'&content='+content;
-    goEasy.on('error', (e) => {
-        console.error(e);
+    socket.on("message",(data)=>{
+        let {user,content}=data;
+        socket.emit("message",{user,content});
     });
-    goEasy.write(queryParams);
-    goEasy.end();
-    res.send(200);
+    socket.on("close", function (code, reason) {
+        console.log("websocket关闭连接")
+    });
+    socket.on("error", function (code, reason) {
+        console.log("websocket异常关闭")
+    });
+    console.log("WebSocket建立完毕")
+});
+httpServer.listen(3000,()=>{
+    console.log("webSocketIo start on http://localhost:3000")
 });
 
-app.post("/talkLogin",(req,res)=>{
-    let appkey = 'BC-a308502501574954856f8a779bbfec66';
-    let  options = {
-        hostname: 'rest-hangzhou.goeasy.io',
-        path: '/publish',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    };
-    let goEasy = http.request(options, (res) => {
-        res.setEncoding('utf8');
-        res.on('data', (result) => {
-            console.log(`响应结果: ${result}`);
-        });
-    });
-    var channel = 'talkLogin';
-    var {user} = req.body;
-    let content=user;
-    var queryParams = 'appkey='+appkey+'&channel='+channel+'&content='+content;
-    goEasy.on('error', (e) => {
-        console.error(e);
-    });
-    goEasy.write(queryParams);
-    goEasy.end();
-    res.send(200);
-});
+// app.post("/getGoEasy",(req,res)=>{
+//     let appkey = 'BC-a308502501574954856f8a779bbfec66';
+//     let  options = {
+//         hostname: 'rest-hangzhou.goeasy.io',
+//         path: '/publish',
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/x-www-form-urlencoded'
+//         }
+//     };
+//     let goEasy = http.request(options, (res) => {
+//         res.setEncoding('utf8');
+//         res.on('data', (result) => {
+//             console.log(`响应结果: ${result}`);
+//         });
+//     });
+//     var channel = 'sendMsg';
+//     var {text,user} = req.body;
+//     let content=user+":"+text;
+//     var queryParams = 'appkey='+appkey+'&channel='+channel+'&content='+content;
+//     goEasy.on('error', (e) => {
+//         console.error(e);
+//     });
+//     goEasy.write(queryParams);
+//     goEasy.end();
+//     res.send(200);
+// });
+//
+// app.post("/talkLogin",(req,res)=>{
+//     let appkey = 'BC-a308502501574954856f8a779bbfec66';
+//     let  options = {
+//         hostname: 'rest-hangzhou.goeasy.io',
+//         path: '/publish',
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/x-www-form-urlencoded'
+//         }
+//     };
+//     let goEasy = http.request(options, (res) => {
+//         res.setEncoding('utf8');
+//         res.on('data', (result) => {
+//             console.log(`响应结果: ${result}`);
+//         });
+//     });
+//     var channel = 'talkLogin';
+//     var {user} = req.body;
+//     let content=user;
+//     var queryParams = 'appkey='+appkey+'&channel='+channel+'&content='+content;
+//     goEasy.on('error', (e) => {
+//         console.error(e);
+//     });
+//     goEasy.write(queryParams);
+//     goEasy.end();
+//     res.send(200);
+// });
 //登陆注册
 app.post("/adminLogin",function (req,res) {
     const {adminName,passWord,ip,location}= req.body;
@@ -1339,6 +1359,6 @@ app.delete("/adminLog", function (req,res) {
     })
 });
 //*********************前端*************************************
-app.listen(8088,function () {
-    console.log("server start success on 8088")
+app.listen(8088,()=>{
+    console.log("appServer start on http://localhost:8088")
 });

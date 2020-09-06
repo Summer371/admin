@@ -29,51 +29,38 @@
                 user:localStorage.adminName
             }
         },
-        methods:{
-            send(){
-                // this.$goEasy.publish({
-                //     channel: "msg", //替换为您自己的channel
-                //     message: this.text //替换为您想要发送的消息内容
-                // });
-
-                this.$axios.post("/getGoEasy",{
-                        text:this.text,
-                    user:localStorage.adminName
-                }).then(data=>{
-                    console.log(data)
-
-                    this.text=""
+        sockets: {
+            message(data) {
+                let user=data.user;
+                let text=data.content;
+                this.textList.push({
+                    user,
+                    text
                 })
             },
-            talkLogin(){
-                let _this=this;
-                this.$axios.post("/talkLogin",{
-                    user:localStorage.adminName
-                }).then(()=>{
-                    this.$goEasy.subscribe({
-                        channel: "talkLogin",//替换为您自己的channel
-                        onMessage: function (message) {
-                            console.log(message)
-                            _this.$message.success(  message.content+"进入了聊天室" )
-                        }
-                    });
-                })
+            connect() {
+                this.id = this.$socket.id;
+                this.$socket.emit('login', {
+                    user:"admin"
+                });   //监听connect事件
+            },
+            join(data){
+                this.$message.success("欢迎"+data+"进入聊天室");
             }
         },
+        methods:{
+            send(content){
+                this.$socket.emit("message",{
+                    user:this.user,
+                    content
+                });
+                this.content="";
+            },
+        },
         mounted() {
-            let _this=this;
-            this.$goEasy.subscribe({
-                channel: "sendMsg",//替换为您自己的channel
-                onMessage: function (message) {
-                    let user=message.content.split(":")[0];
-                    let text=message.content.split(":")[1];
-                    _this.textList.push({
-                        user,
-                        text
-                    })
-                }
+            this.$socket.emit("login",{
+                user:this.user
             });
-            this.talkLogin();
         },
         created () {
             // 回车事件
@@ -120,8 +107,8 @@
     border-radius: 3px;
     padding: 1px 3px;
 }
-   .goeasy  .el-input__inner{
+.goeasy  .el-input__inner{
         width: 240px;
-    }
+}
 
 </style>
