@@ -14,6 +14,7 @@
                         </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="$store.commit('OUT_LOGIN')">退出登陆</el-dropdown-item>
+                <el-dropdown-item @click.native="myCenter">个人中心</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </el-col>
@@ -70,6 +71,18 @@
           <router-view/></el-main>
       </el-container>
     </el-container>
+    <el-drawer
+            title="个人中心"
+            :visible.sync="drawer"
+            direction="rtl"
+            :before-close="handleClose">
+      <ul>
+        <li>
+
+        </li>
+      </ul>
+
+    </el-drawer>
   </div>
 </template>
 <script>
@@ -77,13 +90,30 @@
         data() {
             return {
                 isCollapse: false,
+                drawer:false,
                 admin:localStorage.adminName || ""
             }
         },
+      methods:{
+        myCenter(){
+            this.drawer=true;
+        },
+        handleClose(){
+          this.drawer=false;
+        },
+        getAdminDetial(){
+          this.$axios.post("/adminDetial",{
+            adminName:this.admin
+          }).then((data)=>{
+            console.log(data)
+          })
+        }
+    },
       mounted() {
         // window.onbeforeunload = function (e) {
         //   window.localStorage.clear();
         // }
+        this.getAdminDetial();
       }
     }
 </script>

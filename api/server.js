@@ -494,6 +494,45 @@ app.get("/adminList",async (req,res)=>{
             adminList
         })
 });
+//管理员详情
+app.post("/adminDetial",async (req,res)=>{
+    const {adminName}=req.body;
+    const result=await db.findOne("adminList",{
+        adminName
+    });
+    if(result){
+        res.json({
+            ok:1,
+            msg:"管理员详情",
+            data:result
+        })
+    }else {
+        res.json({
+            ok:-1,
+            msg:"查询失败"
+        })
+    }
+});
+app.post("/insertAdmin", async (req,res)=>{
+    const {adminName}=req.body;
+    const result=await db.findOne("adminList",{
+        adminName
+    });
+    if(result){
+        res.json({
+            ok:-1,
+            msg:adminName+"已经被注册"
+        })
+    }else{
+        const {newPicName,params} = await upPic(req,"adminHead");
+        db.insertOne("adminList",{
+            adminName,
+            passWord:tools.md5(params.passWord),
+            headImg:newPicName,
+            createTime:Date.now()
+        })
+    }
+});
 //店铺类型
 app.post("/shopType",async function (req,res) {
         const {newPicName,params} = await upPic(req,"shopTypePic");

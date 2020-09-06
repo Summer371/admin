@@ -6,14 +6,14 @@
              <li v-for="(item,i) in textList" :key="i" >
                  <div :class="item.user==user?'right':'left'">
                      <b >{{item.user}}</b>:
-                     <span >{{item.text}}</span>
+                     <span >{{item.content}}</span>
                  </div>
 
              </li>
             </ul>
         </div>
         <div class="caozuo">
-            <el-input v-model="text"></el-input><el-button @click="send"  @keyup.enter.native="send">发送</el-button>
+            <el-input v-model="content"></el-input><el-button @click="send"  @keyup.enter.native="send">发送</el-button>
         </div>
 
     </div>
@@ -24,7 +24,7 @@
         name: "goEasy",
         data(){
             return{
-                text:'',
+                content:'',
                 textList:[],
                 user:localStorage.adminName
             }
@@ -32,10 +32,10 @@
         sockets: {
             message(data) {
                 let user=data.user;
-                let text=data.content;
+                let content=data.content;
                 this.textList.push({
                     user,
-                    text
+                    content
                 })
             },
             connect() {
@@ -49,9 +49,10 @@
             }
         },
         methods:{
-            send(content){
+            send(){
+                let{content,user}=this;
                 this.$socket.emit("message",{
-                    user:this.user,
+                    user,
                     content
                 });
                 this.content="";

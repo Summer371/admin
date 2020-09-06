@@ -53,7 +53,7 @@
                     <el-button
                             size="mini"
                             @click="update(scope.row)"
-                    >编辑</el-button>
+                    >权限</el-button>
                     <el-button type="danger"
                                @click="open(scope.row._id)"
                                size="mini">删 除</el-button>
