@@ -63,8 +63,8 @@
             },
             success(data){
                 this.dialogFormVisible=false;
-                this.$parent.getLocationList();
-                this.$store.dispatch("adminHandle",{type:"添加管理员",adminName:localStorage.adminName,msg:data.msg});
+                this.$refs.myForm.resetFields();
+                this.$refs.upload.clearFiles();
                 this.$message.success(data.msg)
             }
         }

@@ -10,7 +10,7 @@
           <el-col :span="8" class="adminInfo">
             <el-dropdown trigger="click">
                         <span class="el-dropdown-link">
-                            <span>{{$store.state.admin.adminName}}</span><img src="./assets/logo.png" alt="">
+                            <span>{{$store.state.admin.adminName}}</span><img :src="adminInfo.picPath?adminInfo.picPath:'http://caoshaogang.com:8088/file/1.jpg'" alt="">
                         </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="$store.commit('OUT_LOGIN')">退出登陆</el-dropdown-item>
@@ -76,11 +76,24 @@
             :visible.sync="drawer"
             direction="rtl"
             :before-close="handleClose">
-      <ul>
-        <li>
 
-        </li>
-      </ul>
+      <el-form label-width="80px" ref="form" >
+        <el-form-item label="管理员名">
+          {{adminInfo.adminName}}
+        </el-form-item>
+        <el-form-item label="管理权限">
+          {{adminInfo.permissions=="00"?"普通":adminInfo.permissions=="01"?"管理":adminInfo.permissions=="02"?"全部":"无"}}
+        </el-form-item>
+        <el-form-item label="上次登录">
+          {{adminInfo.loginTime | time}}
+        </el-form-item>
+        <el-form-item label="注册时间">
+          {{adminInfo.signTime | time}}
+        </el-form-item>
+        <el-form-item >
+
+        </el-form-item>
+      </el-form>
 
     </el-drawer>
   </div>
@@ -91,9 +104,15 @@
             return {
                 isCollapse: false,
                 drawer:false,
+              adminInfo:{},
                 admin:localStorage.adminName || ""
             }
         },
+      sockets:{
+          messageById(data){
+            this.$message.success(data)
+          },
+      },
       methods:{
         myCenter(){
             this.drawer=true;
@@ -105,15 +124,21 @@
           this.$axios.post("/adminDetial",{
             adminName:this.admin
           }).then((data)=>{
-            console.log(data)
+            if(data.ok==1){
+              this.adminInfo=data.data;
+            }else{
+              this.adminInfo={};
+            }
+
           })
         }
     },
       mounted() {
-        // window.onbeforeunload = function (e) {
-        //   window.localStorage.clear();
-        // }
+        window.onbeforeunload = function (e) {
+          window.localStorage.clear();
+        }
         this.getAdminDetial();
+        this.$socket.emit("login",localStorage.adminName)
       }
     }
 </script>
@@ -165,6 +190,7 @@
       .el-dropdown-link {
         span {
           color: #fff;
+          margin: 6px;
         }
         img {
           width: 40px;

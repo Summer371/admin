@@ -35,6 +35,14 @@
                 </template>
             </el-table-column>
             <el-table-column
+                    label="头像"
+                   >
+                <template slot-scope="scope">
+                   <el-image :src="scope.row.picPath"  v-if="scope.row.picPath" style="width: 60px"></el-image>
+                    <span v-if="!scope.row.picPath">暂无头像</span>
+                </template>
+            </el-table-column>
+            <el-table-column
                     label="权限"
                     width="200">
                 <template slot-scope="scope">
@@ -57,27 +65,37 @@
                     <el-button type="danger"
                                @click="open(scope.row._id)"
                                size="mini">删 除</el-button>
+                    <el-button type="primary"
+                               @click="talk(scope.row)"
+                               size="mini">聊 天</el-button>
                 </template>
             </el-table-column>
         </el-table>
         <el-pagination
-                :page-count = "pageSum"
+                :total = "pageSum"
                 @current-change="changeCurrent"
                 background
                 layout="prev, pager, next"
         >
         </el-pagination>
-
+        <talk ref="talk"></talk>
         <setPermissions ref="setPermissions"></setPermissions>
+        <addAdmin ref="addAdmin"></addAdmin>
     </div>
 </template>
 
 <script>
+    import talk from "../../components/dialog/talk";
+    import addAdmin from "../../components/dialog/addAdmin";
     export default {
         name: "adminList",
+        components:{
+            talk,
+            addAdmin
+        },
         data(){
             return{
-                adminName:'',
+                adminName:localStorage.adminName,
                 adminList:[],
                 pageSum:0,
 
@@ -85,13 +103,23 @@
         },
         methods:{
             addAdmin(){
-                this.$router.push("/singn")
+                this.$refs.addAdmin.dialogFormVisible=true;
             },
             search(){
                 this.$message.error("本来就没几个人，别搜了！")
             },
             changeCurrent(v){
-
+                this.pageIndex=v;
+            },
+            talk(op){
+                if(op.adminName==this.adminName){
+                    this.$message.error("不能与自己聊天！")
+                    return
+                }
+                this.$refs.talk.dialogFormVisible=true;
+                this.$refs.talk.socketId=op.socketId;
+                this.$refs.talk.title=op.adminName;
+                this.$refs.talk.user=op.adminName;
             },
             open(id){
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
@@ -127,9 +155,11 @@
             getList(){
                 this.$axios.get("/adminList").then(data=>{
                     if(data.ok==1){
-                        this.adminList=data.adminList;
+                        this.adminList=data.data.adminList;
+                        this.pageSum=data.data.count;
                     }else{
                         this.adminList=[];
+                        this.pageSum=0;
                     }
                 })
             }

@@ -1,21 +1,24 @@
 <template>
     <div class="goeasy">
-
+        <div> <b>小优购物管理员聊天室</b>   当前在线{{count}}人 </div>
         <div class="screen">
             <ul>
              <li v-for="(item,i) in textList" :key="i" >
-                 <div :class="item.user==user?'right':'left'">
-                     <b >{{item.user}}</b>:
+                 <div :class="item.user==user?'right':'left'" v-if="item.user!==user">
+                     <b >{{item.user}}</b>
                      <span >{{item.content}}</span>
                  </div>
+                 <div :class="item.user==user?'right':'left'" v-if="item.user==user">
 
+                     <span >{{item.content}}</span>
+                     <b >{{item.user}}</b>
+                 </div>
              </li>
             </ul>
         </div>
         <div class="caozuo">
             <el-input v-model="content"></el-input><el-button @click="send"  @keyup.enter.native="send">发送</el-button>
         </div>
-
     </div>
 </template>
 
@@ -25,6 +28,8 @@
         data(){
             return{
                 content:'',
+                count:'',
+                id:"",
                 textList:[],
                 user:localStorage.adminName
             }
@@ -39,18 +44,28 @@
                 })
             },
             connect() {
+                //监听connect事件
                 this.id = this.$socket.id;
-                this.$socket.emit('login', {
-                    user:"admin"
-                });   //监听connect事件
+                this.$socket.emit('join', {
+                    user:this.user
+                });
             },
             join(data){
-                this.$message.success("欢迎"+data+"进入聊天室");
+                this.$message.success("欢迎"+data.user+"进入聊天室");
+                this.count=data.count;
+            },
+            leave(data){
+                this.$message.success(data.content);
+                this.count=data.count;
             }
         },
         methods:{
             send(){
                 let{content,user}=this;
+                if(content ==""){
+                    this.$message.error("消息不能为空");
+                    return
+                }
                 this.$socket.emit("message",{
                     user,
                     content
@@ -59,9 +74,7 @@
             },
         },
         mounted() {
-            this.$socket.emit("login",{
-                user:this.user
-            });
+
         },
         created () {
             // 回车事件
@@ -79,10 +92,12 @@
 <style lang="less">
 .caozuo{
     display: flex;
+    width: 60%;
 }
     .screen ul{
-        overflow: hidden;
+        overflow-y: scroll;
         clear: both;
+        height: 100%;
     }
     .left{
         text-align: left;
@@ -103,13 +118,17 @@
 .screen li b{
     border-radius: 10px;
 }
+.screen li b{
+
+    margin: 0 3px;
+}
 .screen li span{
    background: #13ce66;
     border-radius: 3px;
     padding: 1px 3px;
 }
 .goeasy  .el-input__inner{
-        width: 240px;
+       height: 60px;
 }
 
 </style>

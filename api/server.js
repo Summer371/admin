@@ -36,10 +36,33 @@ app.all("*",function (req,res,next) {
 let userList={};
 io.on('connection',function(socket){
     console.log("websocket开始建立连接...");
-    socket.emit('connecting',"server is connected");
+    socket.emit('connect',"server is connected");
     socket.on("login",(data)=>{
-        userList[socket.id]=data.user;
-        socket.emit("join",data.user);
+        userList[socket.id]=data;
+        db.updateOne("adminList",{
+            adminName:data,
+        },{
+            $set:{
+                socketId:socket.id
+            }
+        });
+    });
+    socket.on("join",(data)=>{
+        let user= userList[socket.id];
+        let count=Object.keys(userList).length;
+        io.emit("join",{user,count});
+    });
+    socket.on("disconnect",function () {
+        delete userList[socket.id];
+        io.emit("leave",{content:userList[socket.id]+"退出了房间",count:Object.keys(userList).length});
+    });
+    socket.on("messageById",(data)=>{
+        let {socketId,user,content}=data;
+        // if(socketId==userList[user]){
+        //
+        // }
+        io.to(socketId).emit('messageById',content);
+        socket.emit("messageById", userList[socket.id]+"对"+user+'说:'+content)
     });
     socket.on("message",(data)=>{
         let {user,content}=data;
@@ -487,11 +510,11 @@ app.get("/check",async function (req,res) {
 });
 //管理员列表
 app.get("/adminList",async (req,res)=>{
-        const adminList=await db.find("adminList",{});
+        const adminList=await db.getPageInfo("adminList",{});
         res.json({
             ok:1,
             msg:"管理员列表",
-            adminList
+            data:adminList
         })
 });
 //管理员详情
@@ -514,22 +537,42 @@ app.post("/adminDetial",async (req,res)=>{
     }
 });
 app.post("/insertAdmin", async (req,res)=>{
-    const {adminName}=req.body;
+    const {newPicName,params} = await upPic(req,"adminHead");
+    const {adminName}=params;
+    console.log(adminName)
     const result=await db.findOne("adminList",{
         adminName
     });
     if(result){
+        fs.unlink(__dirname+"/upload/"+newPicName, function (err) {
+            if(err){
+                res.json({
+                    ok:-1,
+                    msg:"删除失败"
+                })
+            }else{
+                res.json({
+                    ok:1,
+                    msg:"删除成功"
+                })
+            }
+        });
         res.json({
             ok:-1,
             msg:adminName+"已经被注册"
         })
     }else{
-        const {newPicName,params} = await upPic(req,"adminHead");
         db.insertOne("adminList",{
             adminName,
             passWord:tools.md5(params.passWord),
             headImg:newPicName,
+            picPath:"http://47.98.238.74:8088/headimg/"+newPicName,
             createTime:Date.now()
+        }).then(()=>{
+            res.json({
+                ok:1,
+                msg:adminName+"注册成功"
+            })
         })
     }
 });
