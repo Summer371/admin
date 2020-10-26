@@ -23,12 +23,12 @@ import components from "@/components"
 //         console.log('连接失败或错误！')
 //     }
 // });
-let url="http://47.98.238.74:8088";
+let url="http://18.183.21.193:8088";
 Vue.prototype.$url=url;
 import VueSocketIO from 'vue-socket.io'
 Vue.use(new VueSocketIO({
     debug: true,
-    connection: 'http://localhost:3000',
+    connection: 'http://18.183.21.193:3000',
     vuex: {
         store,
         actionPrefix: 'SOCKET_',

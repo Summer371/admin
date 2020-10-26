@@ -14,10 +14,8 @@ const mongodb = require("mongodb");
 const formidable = require("formidable");
 const {upPic} = require("./module/upPic");
 
-
 app.use(bodyParser.json());
 app.use(express.static(__dirname+"/upload"));
-
 
 //*********************后台*****************************
 app.all("*",function (req,res,next) {
@@ -566,7 +564,7 @@ app.post("/insertAdmin", async (req,res)=>{
             adminName,
             passWord:tools.md5(params.passWord),
             headImg:newPicName,
-            picPath:"http://47.98.238.74:8088/headimg/"+newPicName,
+            picPath:"http://18.183.21.193:8088/headimg/"+newPicName,
             createTime:Date.now()
         }).then(()=>{
             res.json({
@@ -601,7 +599,7 @@ app.post("/shopType",async function (req,res) {
         }else{
             db.insertOne("shopTypeList",{
                 shopTypePic:newPicName,
-                picPath:"http://47.98.238.74:8088/"+newPicName,
+                picPath:"http://18.183.21.193:8088/"+newPicName,
                 shopType:params.shopType,
                 createTime:Date.now()
             }).then(()=>{
@@ -659,7 +657,7 @@ app.post("/shop",async function (req,res) {
         const shopTypeInfo = await db.findOneById("shopTypeList",params.shopTypeId);
         db.insertOne("shopList",{
             shopPic:newPicName,
-            picPath:"http://47.98.238.74:8088/"+newPicName,
+            picPath:"http://18.183.21.193:8088/"+newPicName,
             shopType:shopTypeInfo.shopType,
             shopTypeId:shopTypeInfo._id,
             shopName:params.shopName,
@@ -680,7 +678,7 @@ app.post("/updateShop",async function (req,res) {
     db.updateOneById("shopList",params.updateId,{
         $set:{
             shopPic:newPicName,
-            picPath:"http://47.98.238.74:8088/"+newPicName,
+            picPath:"http://18.183.21.193:8088/"+newPicName,
             shopType:shopTypeInfo.shopType,
             shopTypeId:shopTypeInfo._id,
             shopName:params.shopName,
@@ -821,7 +819,7 @@ app.post("/goods",async function (req,res) {
         const goodsTypeInfo = await db.findOneById("goodsTypeList",params.goodsTypeId);
         db.insertOne("goodsList",{
             goodsPic:newPicName,
-            picPath:"http://47.98.238.74:8088/"+newPicName,
+            picPath:"http://18.183.21.193:8088/"+newPicName,
             goodsName:params.goodsName,
             goodsType:goodsTypeInfo.goodsType,
             goodsTypeId:goodsTypeInfo._id,
@@ -861,7 +859,7 @@ app.post("/updateGoods",async function(req,res){
         db.updateOneById("goodsList",params.updateId,{
             $set: {
                 goodsPic: newPicName,
-                picPath:"http://47.98.238.74:8088/"+newPicName,
+                picPath:"http://18.183.21.193:8088/"+newPicName,
                 goodsName: params.goodsName,
                 goodsType: goodsInfo.shopType,
                 goodsTypeId: goodsInfo.goodsTypeId,
@@ -988,7 +986,7 @@ app.post("/advertisement",async (req,res)=>{
         const adTypeInfo=await db.findOneById("adTypeList",adTypeId);
         db.insertOne("adList",{
             adPic:newPicName,
-            picPath:"http://47.98.238.74:8088/"+newPicName,
+            picPath:"http://18.183.21.193:8088/"+newPicName,
             shopTypeId:shopInfo.shopTypeId,
             shopName:shopInfo.shopName,
             shopId:shopInfo._id,
@@ -1043,7 +1041,7 @@ app.post("/Location",async (req,res)=>{
     db.insertOne("locationList",{
         userName,
         phone,
-        picPath:"http://47.98.238.74:8088/"+newPicName,
+        picPath:"http://18.183.21.193:8088/"+newPicName,
         headImg:newPicName,
         lng,
         lat,
@@ -1115,7 +1113,7 @@ app.post("/saveFile",(req,res)=>{
             fs.rename(fileInfo.path,uploadDir +"/file/" + newName, function (err) {
                 db.insertOne("fileList",{
                     fileName:newName,
-                    filePath:"http://47.98.238.74:8088" +"/file/"+newName,
+                    filePath:"http://18.183.21.193:8088" +"/file/"+newName,
                     fileType:newName.split(".")[1],
                     createTime:Date.now(),
                     creator:adminName
