@@ -65,7 +65,7 @@
             <span>请添加微信公众号</span>
             <el-image
                     style="width: 120px;"
-                    src="http://47.98.238.74:8088/file/微信公众号.jpg"
+                    src="http://caoshaogang.com:8088/file/微信公众号.jpg"
             ></el-image>
           </div>
           <router-view/></el-main>
@@ -108,11 +108,11 @@
                 admin:localStorage.adminName || ""
             }
         },
-      sockets:{
-          messageById(data){
-            this.$message.success(data)
-          },
-      },
+      // sockets:{
+      //     messageById(data){
+      //       this.$message.success(data)
+      //     },
+      // },
       methods:{
         myCenter(){
             this.drawer=true;

@@ -34,31 +34,31 @@
                 user:localStorage.adminName
             }
         },
-        sockets: {
-            message(data) {
-                let user=data.user;
-                let content=data.content;
-                this.textList.push({
-                    user,
-                    content
-                })
-            },
-            connect() {
-                //监听connect事件
-                this.id = this.$socket.id;
-                this.$socket.emit('join', {
-                    user:this.user
-                });
-            },
-            join(data){
-                this.$message.success("欢迎"+data.user+"进入聊天室");
-                this.count=data.count;
-            },
-            leave(data){
-                this.$message.success(data.content);
-                this.count=data.count;
-            }
-        },
+        // sockets: {
+        //     message(data) {
+        //         let user=data.user;
+        //         let content=data.content;
+        //         this.textList.push({
+        //             user,
+        //             content
+        //         })
+        //     },
+        //     connect() {
+        //         //监听connect事件
+        //         this.id = this.$socket.id;
+        //         this.$socket.emit('join', {
+        //             user:this.user
+        //         });
+        //     },
+        //     join(data){
+        //         this.$message.success("欢迎"+data.user+"进入聊天室");
+        //         this.count=data.count;
+        //     },
+        //     leave(data){
+        //         this.$message.success(data.content);
+        //         this.count=data.count;
+        //     }
+        // },
         methods:{
             send(){
                 let{content,user}=this;

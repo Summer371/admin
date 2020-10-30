@@ -25,17 +25,17 @@ import components from "@/components"
 // });
 let url="http://18.183.21.193:8088";
 Vue.prototype.$url=url;
-import VueSocketIO from 'vue-socket.io'
-Vue.use(new VueSocketIO({
-    debug: true,
-    connection: 'http://18.183.21.193:3000',
-    vuex: {
-        store,
-        actionPrefix: 'SOCKET_',
-        mutationPrefix: 'SOCKET_'
-    },
-    options: { path: "/socket.io/" } //Optional options
-}));
+// import VueSocketIO from 'vue-socket.io'
+// Vue.use(new VueSocketIO({
+//     debug: true,
+//     connection: 'http://18.183.21.193:3000',
+//     vuex: {
+//         store,
+//         actionPrefix: 'SOCKET_',
+//         mutationPrefix: 'SOCKET_'
+//     },
+//     options: { path: "/socket.io/" } //Optional options
+// }));
 Vue.prototype.$axios=axios;
 Vue.use(ElementUI);
 Vue.use(filter);
