@@ -45,7 +45,7 @@ io.on('connection',function(socket){
             }
         });
     });
-    socket.on("join",(data)=>{
+    socket.on("join",()=>{
         let user= userList[socket.id];
         let count=Object.keys(userList).length;
         io.emit("join",{user,count});

@@ -12,7 +12,7 @@
                 <el-button type="primary" @click="submitForm" class="loginBn" :loading="$store.state.loading"  @keyup.enter.native="submitForm">立即登录</el-button>
                 <el-button @click="resetForm" class="resetBn">重置</el-button>
             </el-form-item>
-            <el-form-item  prop="passWord">
+            <el-form-item >
                 <div id='text' style="text-align:center">豫ICP备19039785号<br><a href="http://www.beian.miit.gov.cn">工信部网站</a></div>
             </el-form-item>
         </el-form>

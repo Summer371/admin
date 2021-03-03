@@ -23,7 +23,7 @@ import components from "@/components"
 //         console.log('连接失败或错误！')
 //     }
 // });
-let url="http://18.183.21.193:8088";
+let url="http://localhost:8088";
 Vue.prototype.$url=url;
 // import VueSocketIO from 'vue-socket.io'
 // Vue.use(new VueSocketIO({

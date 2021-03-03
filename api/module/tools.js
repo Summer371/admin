@@ -1,6 +1,7 @@
 const md5 = require("md5");
 const jwt = require("jwt-simple");
 const key = "*&)(*&(*&(*&";
+const request=require("request")
 module.exports.getNowTime = function() {
     const data = new Date();
     return data.getFullYear()+"-"+
@@ -17,6 +18,7 @@ module.exports.json = function (res,ok=-1,msg="网络连接错误") {
         msg
     })
 }
+
 module.exports.md5 = function (context) {
     const str = "ele.com(*&^(*&^(*&";
     return md5(context+str);
